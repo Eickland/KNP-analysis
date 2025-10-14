@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборд - DataLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo">DataLab</a>
+                <button class="mobile-menu-btn">☰</button>
+                <div class="nav-links">
+                    <a href="{{ url_for('index') }}">Главная</a>
+                    <a href="{{ url_for('dashboard') }}">Дашборд</a>
+                    <a href="{{ url_for('analytics') }}">Аналитика</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Дашборд аналитики</h1>
+            <p>Здесь будут отображаться ключевые метрики и визуализации</p>
+            
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                <h3>Страница в разработке</h3>
+                <p>Этот раздел находится в стадии разработки.</p>
+                <a href="{{ url_for('index') }}" class="section-btn" style="display: inline-block; width: auto; padding: 1rem 2rem;">
+                    Вернуться на главную
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

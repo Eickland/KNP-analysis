@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналитика - DataLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .analytics-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .graphs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .graph-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .graph-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+        
+        .graph-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .graph-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #00d4ff;
+        }
+        
+        .graph-description {
+            color: #cccccc;
+            font-size: 0.9rem;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        
+        .stats-info {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #cccccc;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #00d4ff;
+            color: #000;
+            border-color: #00d4ff;
+        }
+        
+        @media (max-width: 768px) {
+            .graphs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo">DataLab</a>
+                <button class="mobile-menu-btn">☰</button>
+                <div class="nav-links">
+                    <a href="{{ url_for('index') }}">Главная</a>
+                    <a href="{{ url_for('dashboard') }}">Дашборд</a>
+                    <a href="{{ url_for('analytics') }}" class="active">Аналитика</a>
+                    <a href="{{ url_for('reports') }}">Отчеты</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="analytics-header">
+                <h1>Аналитика корреляций</h1>
+                <p>Визуализация взаимосвязей между переменными в ваших данных</p>
+                
+                <div class="stats-info">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ images_count }}</div>
+                        <div class="stat-label">Графиков</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{% if images_count > 0 %}100%{% else %}0%{% endif %}</div>
+                        <div class="stat-label">Качество данных</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ images_count * 5 }}</div>
+                        <div class="stat-label">Переменных</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if correlation_images %}
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterGraphs('all')">Все графики</button>
+                <button class="filter-btn" onclick="filterGraphs('matrix')">Матрицы</button>
+                <button class="filter-btn" onclick="filterGraphs('heatmap')">Тепловые карты</button>
+                <button class="filter-btn" onclick="filterGraphs('pairwise')">Парные корреляции</button>
+            </div>
+
+            <div class="graphs-grid" id="graphsContainer">
+                {% for image in correlation_images %}
+                <div class="graph-card" data-type="
+                    {% if 'matrix' in image.lower() %}matrix
+                    {% elif 'heatmap' in image.lower() %}heatmap
+                    {% elif 'pair' in image.lower() %}pairwise
+                    {% else %}other{% endif %}">
+                    <img src="{{ url_for('serve_data_file', filename=image) }}" 
+                         alt="График корреляции {{ image }}" 
+                         class="graph-image"
+                         onerror="this.src='https://via.placeholder.com/600x400/1a1a2e/00d4ff?text=График+не+загружен'">
+                    <div class="graph-title">
+                        {% if 'matrix' in image.lower() %}
+                        Матрица корреляций
+                        {% elif 'heatmap' in image.lower() %}
+                        Тепловая карта корреляций
+                        {% elif 'pair' in image.lower() %}
+                        Парные корреляции
+                        {% else %}
+                        {{ image.replace('.png', '').replace('_', ' ').title() }}
+                        {% endif %}
+                    </div>
+                    <div class="graph-description">
+                        {% if 'matrix' in image.lower() %}
+                        Визуализация всех попарных корреляций между переменными
+                        {% elif 'heatmap' in image.lower() %}
+                        Интерактивная тепловая карта взаимосвязей показателей
+                        {% elif 'pair' in image.lower() %}
+                        Точечные диаграммы для анализа парных зависимостей
+                        {% else %}
+                        График корреляционного анализа данных
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-data">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+                <h3>Графики не найдены</h3>
+                <p>В папке Data нет файлов с графиками корреляций.</p>
+                <p>Добавьте PNG файлы в папку Data или перезапустите сервер для создания демо-графиков.</p>
+                <a href="{{ url_for('index') }}" class="section-btn" style="display: inline-block; width: auto; padding: 1rem 2rem; margin-top: 1rem;">
+                    Вернуться на главную
+                </a>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 15px;">
+                <h3 style="color: #00d4ff; margin-bottom: 1rem;">Интерпретация корреляций</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="text-align: center;">
+                        <div style="background: #ff6b6b; padding: 0.5rem; border-radius: 5px; margin-bottom: 0.5rem;">-1.0 до -0.7</div>
+                        <div style="font-size: 0.9rem;">Сильная отрицательная</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="background: #ffa500; padding: 0.5rem; border-radius: 5px; margin-bottom: 0.5rem;">-0.7 до -0.3</div>
+                        <div style="font-size: 0.9rem;">Умеренная отрицательная</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="background: #4ecdc4; padding: 0.5rem; border-radius: 5px; margin-bottom: 0.5rem;">-0.3 до 0.3</div>
+                        <div style="font-size: 0.9rem;">Слабая или отсутствует</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="background: #45b7d1; padding: 0.5rem; border-radius: 5px; margin-bottom: 0.5rem;">0.3 до 0.7</div>
+                        <div style="font-size: 0.9rem;">Умеренная положительная</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="background: #00d4ff; padding: 0.5rem; border-radius: 5px; margin-bottom: 0.5rem;">0.7 до 1.0</div>
+                        <div style="font-size: 0.9rem;">Сильная положительная</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function filterGraphs(type) {
+            const cards = document.querySelectorAll('.graph-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Обновляем активную кнопку
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(type) || (type === 'all' && btn.textContent.toLowerCase().includes('все'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Фильтруем карточки
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Добавляем обработчики для увеличения изображений
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.graph-image');
+            images.forEach(img => {
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', function() {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 10000;
+                        cursor: pointer;
+                    `;
+                    
+                    const enlargedImg = document.createElement('img');
+                    enlargedImg.src = this.src;
+                    enlargedImg.style.cssText = `
+                        max-width: 90%;
+                        max-height: 90%;
+                        border-radius: 10px;
+                        box-shadow: 0 0 50px rgba(0,212,255,0.3);
+                    `;
+                    
+                    overlay.appendChild(enlargedImg);
+                    overlay.addEventListener('click', function() {
+                        document.body.removeChild(overlay);
+                    });
+                    
+                    document.body.appendChild(overlay);
+                });
+            });
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

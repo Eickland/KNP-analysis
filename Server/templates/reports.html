@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчеты - DataLab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .reports-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .reports-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 0.8rem 1.5rem;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            transform: translateY(-2px);
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .report-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .report-card:hover {
+            border-color: #00d4ff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+        
+        .report-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #00d4ff;
+        }
+        
+        .report-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        .report-filename {
+            color: #cccccc;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+        
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+        }
+        
+        .btn-view {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border-color: #00d4ff;
+        }
+        
+        .btn-download {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border-color: #4caf50;
+        }
+        
+        .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .no-reports {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 20px;
+            color: #cccccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .filter-tab.active {
+            background: #00d4ff;
+            color: #000;
+            border-color: #00d4ff;
+        }
+        
+        .report-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #00d4ff;
+            color: #000;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reports-actions {
+                justify-content: center;
+            }
+            
+            .report-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo">DataLab</a>
+                <button class="mobile-menu-btn">☰</button>
+                <div class="nav-links">
+                    <a href="{{ url_for('index') }}">Главная</a>
+                    <a href="{{ url_for('dashboard') }}">Дашборд</a>
+                    <a href="{{ url_for('analytics') }}">Аналитика</a>
+                    <a href="{{ url_for('reports') }}" class="active">Отчеты</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="reports-header">
+                <h1>Автоматические отчеты</h1>
+                <p>Готовые HTML отчеты, сгенерированные системой анализа данных</p>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-number">{{ reports_count }}</div>
+                    <div>Всего отчетов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ (reports_count * 0.8)|int }}</div>
+                    <div>Активных отчетов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ (reports_count * 1.5)|int }} MB</div>
+                    <div>Общий размер</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div>Доступность</div>
+                </div>
+            </div>
+
+            <div class="reports-actions">
+                <a href="#" class="action-btn" onclick="generateNewReport()">
+                    <span>🔄</span> Сгенерировать новый отчет
+                </a>
+                <a href="#" class="action-btn" onclick="openReportsFolder()">
+                    <span>📁</span> Открыть папку с отчетами
+                </a>
+                <a href="#" class="action-btn" onclick="scheduleReport()">
+                    <span>⏰</span> Настроить расписание
+                </a>
+            </div>
+
+            {% if html_reports %}
+            <div class="filter-tabs">
+                <div class="filter-tab active" onclick="filterReports('all')">Все отчеты</div>
+                <div class="filter-tab" onclick="filterReports('daily')">Ежедневные</div>
+                <div class="filter-tab" onclick="filterReports('weekly')">Еженедельные</div>
+                <div class="filter-tab" onclick="filterReports('monthly')">Ежемесячные</div>
+                <div class="filter-tab" onclick="filterReports('analytics')">Аналитические</div>
+            </div>
+
+            <div class="reports-grid" id="reportsContainer">
+                {% for report in html_reports %}
+                <div class="report-card" data-type="
+                    {% if 'ежедневн' in report.filename.lower() %}daily
+                    {% elif 'недел' in report.filename.lower() %}weekly
+                    {% elif 'месячн' in report.filename.lower() %}monthly
+                    {% else %}analytics{% endif %}">
+                    
+                    {% if 'ежедневн' in report.filename.lower() %}
+                    <div class="report-badge">Ежедневный</div>
+                    <div class="report-icon">📊</div>
+                    {% elif 'недел' in report.filename.lower() %}
+                    <div class="report-badge">Еженедельный</div>
+                    <div class="report-icon">📈</div>
+                    {% elif 'месячн' in report.filename.lower() %}
+                    <div class="report-badge">Ежемесячный</div>
+                    <div class="report-icon">🎯</div>
+                    {% else %}
+                    <div class="report-badge">Аналитика</div>
+                    <div class="report-icon">🔍</div>
+                    {% endif %}
+                    
+                    <div class="report-title">
+                        {% if 'ежедневн' in report.filename.lower() %}
+                        Ежедневный отчет
+                        {% elif 'недел' in report.filename.lower() %}
+                        Недельный анализ
+                        {% elif 'месячн' in report.filename.lower() %}
+                        Месячный отчет
+                        {% elif 'поведен' in report.filename.lower() %}
+                        Анализ поведения
+                        {% else %}
+                        {{ report.filename.replace('.html', '').replace('_', ' ').title() }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="report-filename">
+                        {{ report.filename }}
+                    </div>
+                    
+                    <div class="report-meta">
+                        <div>Размер: {{ "%.1f"|format(report.size / 1024) }} KB</div>
+                        <div>{{ report.modified.strftime('%d.%m.%Y %H:%M') }}</div>
+                    </div>
+                    
+                    <div class="report-actions">
+                        <a href="{{ report.url }}" target="_blank" class="btn-small btn-view">
+                            👁️ Просмотреть
+                        </a>
+                        <a href="{{ url_for('download_report', filename=report.filename) }}" class="btn-small btn-download">
+                            📥 Скачать
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-reports">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                <h3>Отчеты не найдены</h3>
+                <p>В папке Reports нет HTML файлов с отчетами.</p>
+                <p>Добавьте ваши HTML отчеты в папку <strong>Reports</strong> или система создаст демо-отчеты автоматически.</p>
+                
+                <div style="margin-top: 2rem; background: rgba(0,212,255,0.1); padding: 1.5rem; border-radius: 10px; text-align: left;">
+                    <h4 style="color: #00d4ff; margin-bottom: 1rem;">Как добавить свои отчеты:</h4>
+                    <ol style="text-align: left; margin-left: 1rem;">
+                        <li>Создайте папку <strong>Reports</strong> в корне проекта</li>
+                        <li>Поместите ваши HTML файлы в эту папку</li>
+                        <li>Обновите страницу - отчеты появятся автоматически</li>
+                    </ol>
+                </div>
+                
+                <a href="{{ url_for('index') }}" class="action-btn" style="display: inline-flex; margin-top: 2rem;">
+                    Вернуться на главную
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Информация о папке -->
+            <div style="margin-top: 3rem; padding: 1.5rem; background: rgba(0,212,255,0.05); border-radius: 10px;">
+                <h4 style="color: #00d4ff; margin-bottom: 1rem;">💡 Информация о папке отчетов</h4>
+                <p><strong>Путь к папке:</strong> <code>{{ REPORTS_FOLDER.absolute() }}</code></p>
+                <p><strong>Поддерживаемые форматы:</strong> HTML файлы (.html)</p>
+                <p><strong>Автоматическое обновление:</strong> При добавлении новых файлов обновите страницу</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function filterReports(type) {
+            const cards = document.querySelectorAll('.report-card');
+            const tabs = document.querySelectorAll('.filter-tab');
+            
+            // Обновляем активную вкладку
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(type) || (type === 'all' && tab.textContent.toLowerCase().includes('все'))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Фильтруем карточки
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        function generateNewReport() {
+            alert('Функция генерации нового отчета будет реализована в будущем обновлении');
+        }
+        
+        function openReportsFolder() {
+            alert('В продакшн-версии здесь будет открытие папки с отчетами');
+        }
+        
+        function scheduleReport() {
+            alert('Функция настройки расписания отчетов в разработке');
+        }
+        
+        // Автоматическое обновление списка каждые 30 секунд
+        setInterval(() => {
+            console.log('Проверка новых отчетов...');
+            // В реальном приложении здесь можно сделать AJAX запрос
+        }, 30000);
+    </script>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

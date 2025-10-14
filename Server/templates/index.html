@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataLab - Анализ данных</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}" class="logo">DataLab</a>
+                <button class="mobile-menu-btn">☰</button>
+                <div class="nav-links">
+                    <a href="#home">Главная</a>
+                    <a href="#features">Возможности</a>
+                    <a href="#about">О нас</a>
+                    <a href="#contact">Контакты</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Платформа для анализа данных</h1>
+            
+            <!-- Кнопки разделов -->
+            <div class="buttons-grid">
+                <a href="{{ url_for('dashboard') }}" class="section-btn">
+                    <div class="btn-icon">📊</div>
+                    <div class="btn-title">Дашборд</div>
+                    <div class="btn-description">Интерактивные панели управления с ключевыми метриками</div>
+                </a>
+                
+                <a href="{{ url_for('analytics') }}" class="section-btn">
+                    <div class="btn-icon">🔍</div>
+                    <div class="btn-title">Аналитика</div>
+                    <div class="btn-description">Глубокий анализ данных и выявление закономерностей</div>
+                </a>
+                
+                <a href="{{ url_for('reports') }}" class="section-btn">
+                    <div class="btn-icon">📈</div>
+                    <div class="btn-title">Отчеты</div>
+                    <div class="btn-description">Автоматизированные отчеты и визуализации</div>
+                </a>
+                
+                <a href="{{ url_for('predictions') }}" class="section-btn">
+                    <div class="btn-icon">🤖</div>
+                    <div class="btn-title">Прогнозы</div>
+                    <div class="btn-description">Машинное обучение и прогнозное моделирование</div>
+                </a>
+                
+                <a href="{{ url_for('data_import') }}" class="section-btn">
+                    <div class="btn-icon">📥</div>
+                    <div class="btn-title">Импорт данных</div>
+                    <div class="btn-description">Загрузка и подготовка данных из различных источников</div>
+                </a>
+                
+                <a href="{{ url_for('settings') }}" class="section-btn">
+                    <div class="btn-icon">⚙️</div>
+                    <div class="btn-title">Настройки</div>
+                    <div class="btn-description">Настройка системы и параметров анализа</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Наши возможности</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Быстрая обработка</h3>
+                    <p>Мгновенный анализ больших объемов данных</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Точные прогнозы</h3>
+                    <p>AI-алгоритмы для точных предсказаний</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Безопасность</h3>
+                    <p>Защита ваших данных на высшем уровне</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <h3>Доступность</h3>
+                    <p>Работайте с любого устройства в любое время</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="{{ url_for('index') }}" class="logo">DataLab</a>
+                <div class="footer-links">
+                    <a href="#privacy">Конфиденциальность</a>
+                    <a href="#terms">Условия</a>
+                    <a href="#support">Поддержка</a>
+                </div>
+                <div style="color: #cccccc;">
+                    © 2024 DataLab. Все права защищены.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
