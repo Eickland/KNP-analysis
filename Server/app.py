@@ -20,8 +20,8 @@ class Config:
 app.config.from_object(Config)
 
 # Папки для данных
-DATA_FOLDER = Path('Data')
-REPORTS_FOLDER = Path('Reports')
+DATA_FOLDER = Path('data')
+REPORTS_FOLDER = Path('reports')
 REPORTS_FOLDER.mkdir(exist_ok=True)
 
 # База пользователей (в продакшн заменить на реальную БД)
