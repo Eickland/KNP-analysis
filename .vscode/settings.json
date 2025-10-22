@@ -1,4 +1,4 @@
 {
     "dataWrangler.defaultViewingFilterOptions": "basic",
-    "dataWrangler.grid.defaultColumnWidth": 150
+    "dataWrangler.grid.defaultColumnWidth": 100
 }
