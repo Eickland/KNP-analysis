@@ -22,7 +22,7 @@ class Config:
 app.config.from_object(Config)
 
 # Папки для данных
-DATA_FOLDER = Path('data')
+DATA_FOLDER = Path('Received data','Compare data','Graphs')
 REPORTS_FOLDER = Path('reports')
 REPORTS_FOLDER.mkdir(exist_ok=True)
 
@@ -50,9 +50,6 @@ def analytics():
     if DATA_FOLDER.exists():
         for file in DATA_FOLDER.glob('*.png'):
             correlation_images.append(file.name)
-    
-    if not correlation_images:
-        correlation_images = ["correlation_matrix.png", "feature_correlations.png"]
     
     return render_template('analytics.html', 
                          correlation_images=correlation_images,
@@ -92,9 +89,9 @@ def settings():
     return render_template('settings.html')
 
 # Статические файлы (без авторизации для CSS/JS)
-@app.route('/data/<filename>')
+@app.route('/Received data/Compare data/Graphs/<filename>')
 def serve_data_file(filename):
-    return send_from_directory('Data', filename)
+    return send_from_directory('Received data/Compare data/Graphs', filename)
 
 @app.route('/reports/files/<filename>')
 def serve_report_file(filename):

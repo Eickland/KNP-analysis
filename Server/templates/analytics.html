@@ -5,116 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аналитика - DataLab</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .analytics-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .graphs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .graph-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 15px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .graph-card:hover {
-            border-color: #00d4ff;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
-        }
-        
-        .graph-image {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-        
-        .graph-title {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-            color: #00d4ff;
-        }
-        
-        .graph-description {
-            color: #cccccc;
-            font-size: 0.9rem;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 3rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            margin: 2rem 0;
-        }
-        
-        .stats-info {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0, 212, 255, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #00d4ff;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #cccccc;
-        }
-        
-        .filters {
-            display: flex;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            color: #ffffff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .filter-btn:hover, .filter-btn.active {
-            background: #00d4ff;
-            color: #000;
-            border-color: #00d4ff;
-        }
-        
-        @media (max-width: 768px) {
-            .graphs-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .filters {
-                justify-content: center;
-            }
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -135,23 +25,8 @@
     <section class="hero">
         <div class="container">
             <div class="analytics-header">
-                <h1>Аналитика корреляций</h1>
-                <p>Визуализация взаимосвязей между переменными в ваших данных</p>
-                
-                <div class="stats-info">
-                    <div class="stat-item">
-                        <div class="stat-value">{{ images_count }}</div>
-                        <div class="stat-label">Графиков</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{% if images_count > 0 %}100%{% else %}0%{% endif %}</div>
-                        <div class="stat-label">Качество данных</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">{{ images_count * 5 }}</div>
-                        <div class="stat-label">Переменных</div>
-                    </div>
-                </div>
+                <h1>Сравнение данных</h1>
+
             </div>
 
             {% if correlation_images %}
