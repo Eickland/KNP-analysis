@@ -1,0 +1,558 @@
+
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Анализ кластеризации с подклассами</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                margin: 0;
+                padding: 20px;
+                background-color: #ffffff; /* БЕЛЫЙ ФОН */
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.05); /* Более легкая тень */
+            }
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                border-radius: 10px;
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            .section {
+                margin-bottom: 30px;
+                padding: 20px;
+                background: #ffffff; /* БЕЛЫЙ ФОН СЕКЦИЙ */
+                border-radius: 8px;
+                border-left: 4px solid #667eea;
+                border: 1px solid #e0e0e0; /* Добавляем границу */
+            }
+            .section h2 {
+                color: #333;
+                border-bottom: 2px solid #667eea;
+                padding-bottom: 10px;
+                margin-top: 0;
+            }
+            .console-output {
+                background: #f8f9fa; /* Светлый фон вместо темного */
+                color: #333; /* Темный текст */
+                padding: 20px;
+                border-radius: 5px;
+                font-family: 'Courier New', monospace;
+                white-space: pre-wrap;
+                overflow-x: auto;
+                font-size: 14px;
+                border: 1px solid #ddd;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+                background: white;
+                border: 1px solid #ddd;
+            }
+            table, th, td {
+                border: 1px solid #ddd;
+            }
+            th {
+                background: #667eea;
+                color: white;
+                padding: 12px;
+                text-align: left;
+            }
+            td {
+                padding: 10px;
+                background: white;
+            }
+            tr:nth-child(even) {
+                background: #f8f9fa;
+            }
+            .highlight {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+                border-left: 4px solid #667eea;
+            }
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin: 20px 0;
+            }
+            .summary-card {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                border: 1px solid #e0e0e0;
+            }
+            .summary-card h3 {
+                margin: 0;
+                color: #667eea;
+                font-size: 24px;
+            }
+            .summary-card p {
+                margin: 5px 0 0 0;
+                color: #666;
+            }
+            .timestamp {
+                text-align: right;
+                color: #888;
+                font-style: italic;
+                margin-top: 30px;
+            }
+            /* Улучшения для таблиц */
+            .dataframe {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .dataframe th {
+                background: #667eea;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>📊 Анализ кластеризации с подклассами</h1>
+                <p>Автоматический отчет по результатам кластеризации K-Means</p>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>90</h3>
+                    <p>Всего наблюдений</p>
+                </div>
+                <div class="summary-card">
+                    <h3>3</h3>
+                    <p>Кластеров</p>
+                </div>
+                <div class="summary-card">
+                    <h3>11</h3>
+                    <p>Уникальных подклассов</p>
+                </div>
+                <div class="summary-card">
+                    <h3>7</h3>
+                    <p>Признаков</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 Полный вывод анализа</h2>
+                <div class="console-output">============================================================
+АНАЛИЗ КЛАСТЕРИЗАЦИИ С ПОДКЛАССАМИ
+============================================================
+1. Предобработка данных...
+   Размерность данных: (90, 6)
+   Количество признаков: 6
+2. Используется заданное число кластеров: 3
+3. Выполнение кластеризации K-Means...
+4. Анализ распределения подклассов по кластерам...
+
+============================================================
+РЕЗУЛЬТАТЫ КЛАСТЕРИЗАЦИИ
+============================================================
+
+Общая информация:
+- Всего наблюдений: 90
+- Количество кластеров: 3
+- Количество подклассов: 11
+- Silhouette Score: 0.2100
+
+Распределение по кластерам:
+  Кластер 0: 16 наблюдений (17.8%)
+  Кластер 1: 34 наблюдений (37.8%)
+  Кластер 2: 40 наблюдений (44.4%)
+
+ТАБЛИЦА СОПРЯЖЕННОСТИ: Подклассы × Кластеры
+--------------------------------------------------
+cluster      0   1   2  Всего
+row_0                        
+Baikal       0  10   0     10
+Storage 1    4   0   1      5
+Storage 10   1   1   4      6
+Storage 2    0   0   6      6
+Storage 3    1   0   2      3
+Storage 4    0   3   4      7
+Storage 5    0   1  11     12
+Storage 6    7   0   6     13
+Storage 7    2   4   2      8
+Storage 8    1   7   0      8
+Storage 9    0   8   4     12
+Всего       16  34  40     90
+
+ПРОЦЕНТНОЕ РАСПРЕДЕЛЕНИЕ (% по строкам)
+--------------------------------------------------
+cluster        0      1      2
+row_0                         
+Baikal       0.0  100.0    0.0
+Storage 1   80.0    0.0   20.0
+Storage 10  16.7   16.7   66.7
+Storage 2    0.0    0.0  100.0
+Storage 3   33.3    0.0   66.7
+Storage 4    0.0   42.9   57.1
+Storage 5    0.0    8.3   91.7
+Storage 6   53.8    0.0   46.2
+Storage 7   25.0   50.0   25.0
+Storage 8   12.5   87.5    0.0
+Storage 9    0.0   66.7   33.3
+
+АНАЛИЗ 'ЧИСТОТЫ' КЛАСТЕРОВ:
+--------------------------------------------------
+ Кластер  Наблюдений  Уникальных подклассов Доминирующий подкласс Доля доминирующего
+       0          16                      6             Storage 6              43.8%
+       1          34                      7                Baikal              29.4%
+       2          40                      9             Storage 5              27.5%
+
+ХАРАКТЕРИСТИКИ КЛАСТЕРОВ (средние значения):
+------------------------------------------------------------
+          E2E3   C_org     pH       eH  Asm_280  Component_1
+cluster                                                     
+0        3.637  12.367  7.036  -53.438    0.933       36.728
+1        2.299   3.981  7.348  101.000    0.897       36.054
+2        3.782   7.294  6.805   57.000    0.727       46.623
+
+МАППИНГ ПОДКЛАССОВ НА ОСНОВНЫЕ КЛАСТЕРЫ:
+--------------------------------------------------
+  Storage 1 → Кластер 0
+  Storage 10 → Кластер 2
+  Storage 2 → Кластер 2
+  Storage 3 → Кластер 2
+  Storage 4 → Кластер 2
+  Storage 5 → Кластер 2
+  Storage 6 → Кластер 0
+  Storage 7 → Кластер 1
+  Storage 8 → Кластер 1
+  Storage 9 → Кластер 1
+  Baikal → Кластер 1
+</div>
+            </div>
+
+            <div class="section">
+                <h2>🔍 Таблица сопряженности: Подклассы × Кластеры</h2>
+                <table class="dataframe dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>cluster</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>Всего</th>
+    </tr>
+    <tr>
+      <th>row_0</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Baikal</th>
+      <td>0</td>
+      <td>10</td>
+      <td>0</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>Storage 1</th>
+      <td>4</td>
+      <td>0</td>
+      <td>1</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Storage 10</th>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>Storage 2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>Storage 3</th>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>Storage 4</th>
+      <td>0</td>
+      <td>3</td>
+      <td>4</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Storage 5</th>
+      <td>0</td>
+      <td>1</td>
+      <td>11</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Storage 6</th>
+      <td>7</td>
+      <td>0</td>
+      <td>6</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Storage 7</th>
+      <td>2</td>
+      <td>4</td>
+      <td>2</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Storage 8</th>
+      <td>1</td>
+      <td>7</td>
+      <td>0</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Storage 9</th>
+      <td>0</td>
+      <td>8</td>
+      <td>4</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Всего</th>
+      <td>16</td>
+      <td>34</td>
+      <td>40</td>
+      <td>90</td>
+    </tr>
+  </tbody>
+</table>
+            </div>
+
+            <div class="section">
+                <h2>📈 Процентное распределение подклассов</h2>
+                <p><em>Проценты показывают распределение каждого подкласса по кластерам</em></p>
+                <table class="dataframe dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>cluster</th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+    </tr>
+    <tr>
+      <th>row_0</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Baikal</th>
+      <td>0.0</td>
+      <td>100.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Storage 1</th>
+      <td>80.0</td>
+      <td>0.0</td>
+      <td>20.0</td>
+    </tr>
+    <tr>
+      <th>Storage 10</th>
+      <td>16.7</td>
+      <td>16.7</td>
+      <td>66.7</td>
+    </tr>
+    <tr>
+      <th>Storage 2</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>100.0</td>
+    </tr>
+    <tr>
+      <th>Storage 3</th>
+      <td>33.3</td>
+      <td>0.0</td>
+      <td>66.7</td>
+    </tr>
+    <tr>
+      <th>Storage 4</th>
+      <td>0.0</td>
+      <td>42.9</td>
+      <td>57.1</td>
+    </tr>
+    <tr>
+      <th>Storage 5</th>
+      <td>0.0</td>
+      <td>8.3</td>
+      <td>91.7</td>
+    </tr>
+    <tr>
+      <th>Storage 6</th>
+      <td>53.8</td>
+      <td>0.0</td>
+      <td>46.2</td>
+    </tr>
+    <tr>
+      <th>Storage 7</th>
+      <td>25.0</td>
+      <td>50.0</td>
+      <td>25.0</td>
+    </tr>
+    <tr>
+      <th>Storage 8</th>
+      <td>12.5</td>
+      <td>87.5</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>Storage 9</th>
+      <td>0.0</td>
+      <td>66.7</td>
+      <td>33.3</td>
+    </tr>
+  </tbody>
+</table>
+            </div>
+
+            <div class="section">
+                <h2>🎯 Анализ чистоты кластеров</h2>
+                <table class="dataframe dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Кластер</th>
+      <th>Наблюдений</th>
+      <th>Уникальных подклассов</th>
+      <th>Доминирующий подкласс</th>
+      <th>Доля доминирующего</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>16</td>
+      <td>6</td>
+      <td>Storage 6</td>
+      <td>43.8%</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>34</td>
+      <td>7</td>
+      <td>Baikal</td>
+      <td>29.4%</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>40</td>
+      <td>9</td>
+      <td>Storage 5</td>
+      <td>27.5%</td>
+    </tr>
+  </tbody>
+</table>
+            </div>
+
+            <div class="section">
+                <h2>📊 Характеристики кластеров</h2>
+                <p><em>Средние значения признаков по кластерам</em></p>
+                <table class="dataframe dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>E2E3</th>
+      <th>C_org</th>
+      <th>pH</th>
+      <th>eH</th>
+      <th>Asm_280</th>
+      <th>Component_1</th>
+    </tr>
+    <tr>
+      <th>cluster</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.637</td>
+      <td>12.367</td>
+      <td>7.036</td>
+      <td>-53.438</td>
+      <td>0.933</td>
+      <td>36.728</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.299</td>
+      <td>3.981</td>
+      <td>7.348</td>
+      <td>101.000</td>
+      <td>0.897</td>
+      <td>36.054</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.782</td>
+      <td>7.294</td>
+      <td>6.805</td>
+      <td>57.000</td>
+      <td>0.727</td>
+      <td>46.623</td>
+    </tr>
+  </tbody>
+</table>
+            </div>
+
+            <div class="section">
+                <h2>🗺️ Маппинг подклассов на кластеры</h2>
+                <div class="highlight">
+    <p><strong>Storage 1</strong> → Основной кластер <strong>0</strong></p>
+<p><strong>Storage 10</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 2</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 3</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 4</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 5</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 6</strong> → Основной кластер <strong>0</strong></p>
+<p><strong>Storage 7</strong> → Основной кластер <strong>1</strong></p>
+<p><strong>Storage 8</strong> → Основной кластер <strong>1</strong></p>
+<p><strong>Storage 9</strong> → Основной кластер <strong>1</strong></p>
+<p><strong>Baikal</strong> → Основной кластер <strong>1</strong></p>
+
+                </div>
+            </div>
+
+            <div class="timestamp">
+                Отчет сгенерирован: 2025-11-06 13:07:18
+            </div>
+        </div>
+    </body>
+    </html>
+    
