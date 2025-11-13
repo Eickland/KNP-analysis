@@ -21,7 +21,9 @@ for i, folder in enumerate(date_folder_list):
     
     fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
     uv_abs_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
-    uv_refl_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
+    
+    if i == 1:
+        uv_refl_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
     
     for fl_spectra in fluo_spectra:
         
@@ -32,4 +34,27 @@ for i, folder in enumerate(date_folder_list):
         plt.savefig(
             Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","Fluorescence","Individual_spectra",f"{fl_spectra.attrs['name']}")
                     )
+        plt.close()
+        
+    for uv_spectra in uv_abs_spectra:
+        
+        uv.plot_uv(uv_spectra)
+        
+        plt.tight_layout()
+        plt.savefig(
+            Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Individual_spectra",f"{uv_spectra.attrs['name']}")
+                    )
+        plt.close()
+    
+    if i == 1:
+         
+        for uv_spectra in uv_refl_spectra:
+            
+            uv.plot_uv(uv_spectra)
+            
+            plt.tight_layout()
+            plt.savefig(
+                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Reflection","Individual_spectra",f"{uv_spectra.attrs['name']}")
+                        )
+            plt.close()
         
