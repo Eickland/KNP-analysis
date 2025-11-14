@@ -17,7 +17,7 @@ geodata = pd.read_excel(Path.joinpath(wdir_date, 'GeoData.xlsx'))
 fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
 uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
 
-parafac_data = pd.read_csv(Path.joinpath(Path.cwd(),"Server","Received_data","Parafac","data","parafac_2025.csv"))
+parafac_data = pd.read_csv(Path.joinpath(Path.cwd(),    "Server","Received_data","Parafac","data","parafac_2025.csv"))
 parafac_data.rename(columns={parafac_data.columns[0]:"Sample"},inplace=True)
 
 fl_data = ut.spectra_to_df(fluo_spectra, {

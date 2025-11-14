@@ -9,6 +9,8 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
+FluoPlotEnable = False
+
 from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA_PATH
 
 date_list = ["2024","2025"]
@@ -24,19 +26,23 @@ for i, folder in enumerate(date_folder_list):
     
     if i == 1:
         uv_refl_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
+
+    if FluoPlotEnable:
     
-    for fl_spectra in fluo_spectra:
-        
-        fl_spectra = fl.cut_spectra(fl_spectra,255,450,255,600)
-        fl.plot_heat_map(fl_spectra)
-        
-        plt.tight_layout()
-        plt.savefig(
-            Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","Fluorescence","Individual_spectra",f"{fl_spectra.attrs['name']}")
-                    )
-        plt.close()
+        for fl_spectra in fluo_spectra:
+            
+            fl_spectra = fl.cut_spectra(fl_spectra,255,450,255,600)
+            fl.plot_heat_map(fl_spectra)
+            
+            plt.tight_layout()
+            plt.savefig(
+                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","Fluorescence","Individual_spectra",f"{fl_spectra.attrs['name']}")
+                        )
+            plt.close()
         
     for uv_spectra in uv_abs_spectra:
+        
+        uv_spectra = uv_spectra.iloc[int(len(uv_spectra) * 5 / 100):]
         
         uv.plot_uv(uv_spectra)
         
