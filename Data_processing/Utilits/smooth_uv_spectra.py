@@ -343,8 +343,8 @@ for i, folder in enumerate(date_folder_list):
         
     for uv_spectra in uv_abs_spectra:
         
-        uv_spectra = uv_spectra.iloc[int(len(uv_spectra) * 5 / 100):]
         uv_spectra = smooth_uv_spectrum_peaks(uv_spectra, window_size=9, threshold_factor=1.5)
+        uv_spectra = uv_spectra.iloc[int(len(uv_spectra) * 8 / 100):]
         
         uv.plot_uv(uv_spectra)
         
