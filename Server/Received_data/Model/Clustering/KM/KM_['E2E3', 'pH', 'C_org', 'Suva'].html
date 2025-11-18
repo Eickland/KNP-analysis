@@ -132,11 +132,11 @@
             
             <div class="summary-grid">
                 <div class="summary-card">
-                    <h3>93</h3>
+                    <h3>141</h3>
                     <p>Всего наблюдений</p>
                 </div>
                 <div class="summary-card">
-                    <h3>7</h3>
+                    <h3>9</h3>
                     <p>Кластеров</p>
                 </div>
                 <div class="summary-card">
@@ -155,19 +155,19 @@
 АНАЛИЗ КЛАСТЕРИЗАЦИИ С ПОДКЛАССАМИ
 ============================================================
 1. Предобработка данных...
-   Размерность данных: (93, 4)
+   Размерность данных: (141, 4)
    Количество признаков: 4
 2. Подбор оптимального числа кластеров...
-   k=2: Silhouette Score = 0.2581
-   k=3: Silhouette Score = 0.3036
-   k=4: Silhouette Score = 0.3051
-   k=5: Silhouette Score = 0.3301
-   k=6: Silhouette Score = 0.3495
-   k=7: Silhouette Score = 0.3642
-   k=8: Silhouette Score = 0.3437
-   k=9: Silhouette Score = 0.3283
-   k=10: Silhouette Score = 0.3365
-   Оптимальное число кластеров: 7 (silhouette: 0.3642)
+   k=2: Silhouette Score = 0.3341
+   k=3: Silhouette Score = 0.3037
+   k=4: Silhouette Score = 0.3057
+   k=5: Silhouette Score = 0.3423
+   k=6: Silhouette Score = 0.3658
+   k=7: Silhouette Score = 0.3685
+   k=8: Silhouette Score = 0.3892
+   k=9: Silhouette Score = 0.3977
+   k=10: Silhouette Score = 0.3545
+   Оптимальное число кластеров: 9 (silhouette: 0.3977)
 3. Выполнение кластеризации K-Means...
 4. Анализ распределения подклассов по кластерам...
 
@@ -176,89 +176,95 @@
 ============================================================
 
 Общая информация:
-- Всего наблюдений: 93
-- Количество кластеров: 7
+- Всего наблюдений: 141
+- Количество кластеров: 9
 - Количество подклассов: 11
-- Silhouette Score: 0.3642
+- Silhouette Score: 0.3977
 
 Распределение по кластерам:
-  Кластер 0: 6 наблюдений (6.5%)
-  Кластер 1: 33 наблюдений (35.5%)
-  Кластер 2: 10 наблюдений (10.8%)
-  Кластер 3: 6 наблюдений (6.5%)
-  Кластер 4: 10 наблюдений (10.8%)
-  Кластер 5: 8 наблюдений (8.6%)
-  Кластер 6: 20 наблюдений (21.5%)
+  Кластер 0: 9 наблюдений (6.4%)
+  Кластер 1: 18 наблюдений (12.8%)
+  Кластер 2: 25 наблюдений (17.7%)
+  Кластер 3: 15 наблюдений (10.6%)
+  Кластер 4: 45 наблюдений (31.9%)
+  Кластер 5: 10 наблюдений (7.1%)
+  Кластер 6: 7 наблюдений (5.0%)
+  Кластер 7: 8 наблюдений (5.7%)
+  Кластер 8: 4 наблюдений (2.8%)
 
 ТАБЛИЦА СОПРЯЖЕННОСТИ: Подклассы × Кластеры
 --------------------------------------------------
-cluster     0   1   2  3   4  5   6  Всего
-row_0                                     
-Baikal      2   0   9  0   0  0   0     11
-Storage 1   0   1   0  0   4  0   0      5
-Storage 10  0   0   0  0   1  5   0      6
-Storage 2   1   0   0  0   0  3   2      6
-Storage 3   0   1   0  0   0  0   2      3
-Storage 4   0   6   0  0   1  0   1      8
-Storage 5   3   9   0  0   0  0   0     12
-Storage 6   0  10   0  0   2  0   1     13
-Storage 7   0   6   0  0   2  0   0      8
-Storage 8   0   0   1  6   0  0   1      8
-Storage 9   0   0   0  0   0  0  13     13
-Всего       6  33  10  6  10  8  20     93
+cluster     0   1   2   3   4   5  6  7  8  Всего
+row_0                                            
+Baikal      0   7   1   0   0   0  1  1  0     10
+Storage 1   0   0   0   4   1   0  0  0  0      5
+Storage 10  0   0   0   1   0   3  0  0  4      8
+Storage 2   2   0   2   0   0   7  0  0  0     11
+Storage 3   0   0   4   0   0   0  0  0  0      4
+Storage 4   0   0   4   2   8   0  0  0  0     14
+Storage 5   0   0   2   0  16   0  6  0  0     24
+Storage 6   0   0   2   4  20   0  0  0  0     26
+Storage 7   0  10   2   4   0   0  0  0  0     16
+Storage 8   0   1   1   0   0   0  0  7  0      9
+Storage 9   7   0   7   0   0   0  0  0  0     14
+Всего       9  18  25  15  45  10  7  8  4    141
 
 ПРОЦЕНТНОЕ РАСПРЕДЕЛЕНИЕ (% по строкам)
 --------------------------------------------------
-cluster        0     1     2     3     4     5      6
-row_0                                                
-Baikal      18.2   0.0  81.8   0.0   0.0   0.0    0.0
-Storage 1    0.0  20.0   0.0   0.0  80.0   0.0    0.0
-Storage 10   0.0   0.0   0.0   0.0  16.7  83.3    0.0
-Storage 2   16.7   0.0   0.0   0.0   0.0  50.0   33.3
-Storage 3    0.0  33.3   0.0   0.0   0.0   0.0   66.7
-Storage 4    0.0  75.0   0.0   0.0  12.5   0.0   12.5
-Storage 5   25.0  75.0   0.0   0.0   0.0   0.0    0.0
-Storage 6    0.0  76.9   0.0   0.0  15.4   0.0    7.7
-Storage 7    0.0  75.0   0.0   0.0  25.0   0.0    0.0
-Storage 8    0.0   0.0  12.5  75.0   0.0   0.0   12.5
-Storage 9    0.0   0.0   0.0   0.0   0.0   0.0  100.0
+cluster        0     1      2     3     4     5     6     7     8
+row_0                                                            
+Baikal       0.0  70.0   10.0   0.0   0.0   0.0  10.0  10.0   0.0
+Storage 1    0.0   0.0    0.0  80.0  20.0   0.0   0.0   0.0   0.0
+Storage 10   0.0   0.0    0.0  12.5   0.0  37.5   0.0   0.0  50.0
+Storage 2   18.2   0.0   18.2   0.0   0.0  63.6   0.0   0.0   0.0
+Storage 3    0.0   0.0  100.0   0.0   0.0   0.0   0.0   0.0   0.0
+Storage 4    0.0   0.0   28.6  14.3  57.1   0.0   0.0   0.0   0.0
+Storage 5    0.0   0.0    8.3   0.0  66.7   0.0  25.0   0.0   0.0
+Storage 6    0.0   0.0    7.7  15.4  76.9   0.0   0.0   0.0   0.0
+Storage 7    0.0  62.5   12.5  25.0   0.0   0.0   0.0   0.0   0.0
+Storage 8    0.0  11.1   11.1   0.0   0.0   0.0   0.0  77.8   0.0
+Storage 9   50.0   0.0   50.0   0.0   0.0   0.0   0.0   0.0   0.0
 
 АНАЛИЗ 'ЧИСТОТЫ' КЛАСТЕРОВ:
 --------------------------------------------------
  Кластер  Наблюдений  Уникальных подклассов Доминирующий подкласс Доля доминирующего
-       0           6                      3             Storage 5              50.0%
-       1          33                      6             Storage 6              30.3%
-       2          10                      2                Baikal              90.0%
-       3           6                      1             Storage 8             100.0%
-       4          10                      5             Storage 1              40.0%
-       5           8                      2            Storage 10              62.5%
-       6          20                      6             Storage 9              65.0%
+       0           9                      2             Storage 9              77.8%
+       1          18                      3             Storage 7              55.6%
+       2          25                      9             Storage 9              28.0%
+       3          15                      5             Storage 1              26.7%
+       4          45                      4             Storage 6              44.4%
+       5          10                      2             Storage 2              70.0%
+       6           7                      2             Storage 5              85.7%
+       7           8                      2             Storage 8              87.5%
+       8           4                      1            Storage 10             100.0%
 
 ХАРАКТЕРИСТИКИ КЛАСТЕРОВ (средние значения):
 ------------------------------------------------------------
           E2E3     pH   C_org   Suva
 cluster                             
-0        3.494  7.945   2.003  5.570
-1        4.042  7.746   7.755  2.223
-2        1.949  8.379   2.004  1.209
-3        1.017  5.213   1.525  1.329
-4        4.126  7.287  16.908  1.787
-5        3.194  4.326   8.135  2.858
-6        2.585  6.556   6.224  3.133
+0        1.709  6.307   4.694  5.983
+1        2.383  8.608   5.225  1.421
+2        1.979  7.192   6.620  3.239
+3        3.536  7.189  17.215  2.006
+4        4.124  7.524   7.834  2.382
+5        1.712  4.501   8.792  4.832
+6        2.394  8.000   2.125  6.494
+7        1.001  5.530   1.534  1.394
+8        3.766  4.292   5.796  2.640
 
 МАППИНГ ПОДКЛАССОВ НА ОСНОВНЫЕ КЛАСТЕРЫ:
 --------------------------------------------------
-  Storage 1 → Кластер 4
-  Storage 10 → Кластер 5
+  Storage 1 → Кластер 3
+  Storage 10 → Кластер 8
   Storage 2 → Кластер 5
-  Storage 3 → Кластер 6
-  Storage 4 → Кластер 1
-  Storage 5 → Кластер 1
-  Storage 6 → Кластер 1
+  Storage 3 → Кластер 2
+  Storage 4 → Кластер 4
+  Storage 5 → Кластер 4
+  Storage 6 → Кластер 4
   Storage 7 → Кластер 1
-  Storage 8 → Кластер 3
-  Storage 9 → Кластер 6
-  Baikal → Кластер 2
+  Storage 8 → Кластер 7
+  Storage 9 → Кластер 0
+  Baikal → Кластер 1
 </div>
             </div>
             
@@ -275,10 +281,14 @@ cluster
       <th>4</th>
       <th>5</th>
       <th>6</th>
+      <th>7</th>
+      <th>8</th>
       <th>Всего</th>
     </tr>
     <tr>
       <th>row_0</th>
+      <th></th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -292,22 +302,26 @@ cluster
   <tbody>
     <tr>
       <th>Baikal</th>
-      <td>2</td>
       <td>0</td>
-      <td>9</td>
-      <td>0</td>
-      <td>0</td>
+      <td>7</td>
+      <td>1</td>
       <td>0</td>
       <td>0</td>
-      <td>11</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>10</td>
     </tr>
     <tr>
       <th>Storage 1</th>
       <td>0</td>
-      <td>1</td>
       <td>0</td>
       <td>0</td>
       <td>4</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>5</td>
@@ -317,110 +331,130 @@ cluster
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
       <td>1</td>
-      <td>5</td>
       <td>0</td>
-      <td>6</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4</td>
+      <td>8</td>
     </tr>
     <tr>
       <th>Storage 2</th>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>3</td>
       <td>2</td>
-      <td>6</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>7</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>11</td>
     </tr>
     <tr>
       <th>Storage 3</th>
       <td>0</td>
-      <td>1</td>
+      <td>0</td>
+      <td>4</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>2</td>
-      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4</td>
     </tr>
     <tr>
       <th>Storage 4</th>
       <td>0</td>
-      <td>6</td>
       <td>0</td>
-      <td>0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>1</td>
+      <td>4</td>
+      <td>2</td>
       <td>8</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>14</td>
     </tr>
     <tr>
       <th>Storage 5</th>
-      <td>3</td>
-      <td>9</td>
       <td>0</td>
       <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>16</td>
+      <td>0</td>
+      <td>6</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
-      <td>12</td>
+      <td>24</td>
     </tr>
     <tr>
       <th>Storage 6</th>
       <td>0</td>
-      <td>10</td>
-      <td>0</td>
       <td>0</td>
       <td>2</td>
+      <td>4</td>
+      <td>20</td>
       <td>0</td>
-      <td>1</td>
-      <td>13</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>26</td>
     </tr>
     <tr>
       <th>Storage 7</th>
       <td>0</td>
-      <td>6</td>
-      <td>0</td>
-      <td>0</td>
+      <td>10</td>
       <td>2</td>
+      <td>4</td>
       <td>0</td>
       <td>0</td>
-      <td>8</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>16</td>
     </tr>
     <tr>
       <th>Storage 8</th>
       <td>0</td>
-      <td>0</td>
       <td>1</td>
-      <td>6</td>
-      <td>0</td>
-      <td>0</td>
       <td>1</td>
-      <td>8</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>7</td>
+      <td>0</td>
+      <td>9</td>
     </tr>
     <tr>
       <th>Storage 9</th>
+      <td>7</td>
+      <td>0</td>
+      <td>7</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>13</td>
-      <td>13</td>
+      <td>14</td>
     </tr>
     <tr>
       <th>Всего</th>
-      <td>6</td>
-      <td>33</td>
+      <td>9</td>
+      <td>18</td>
+      <td>25</td>
+      <td>15</td>
+      <td>45</td>
       <td>10</td>
-      <td>6</td>
-      <td>10</td>
+      <td>7</td>
       <td>8</td>
-      <td>20</td>
-      <td>93</td>
+      <td>4</td>
+      <td>141</td>
     </tr>
   </tbody>
 </table>
@@ -440,9 +474,13 @@ cluster
       <th>4</th>
       <th>5</th>
       <th>6</th>
+      <th>7</th>
+      <th>8</th>
     </tr>
     <tr>
       <th>row_0</th>
+      <th></th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -455,21 +493,25 @@ cluster
   <tbody>
     <tr>
       <th>Baikal</th>
-      <td>18.2</td>
       <td>0.0</td>
-      <td>81.8</td>
+      <td>70.0</td>
+      <td>10.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
+      <td>10.0</td>
+      <td>10.0</td>
       <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 1</th>
       <td>0.0</td>
-      <td>20.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>80.0</td>
+      <td>20.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
     </tr>
@@ -478,90 +520,108 @@ cluster
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
+      <td>12.5</td>
       <td>0.0</td>
-      <td>16.7</td>
-      <td>83.3</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>Storage 2</th>
-      <td>16.7</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>37.5</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>50.0</td>
-      <td>33.3</td>
+    </tr>
+    <tr>
+      <th>Storage 2</th>
+      <td>18.2</td>
+      <td>0.0</td>
+      <td>18.2</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>63.6</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 3</th>
       <td>0.0</td>
-      <td>33.3</td>
+      <td>0.0</td>
+      <td>100.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>66.7</td>
+      <td>0.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 4</th>
       <td>0.0</td>
-      <td>75.0</td>
+      <td>0.0</td>
+      <td>28.6</td>
+      <td>14.3</td>
+      <td>57.1</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>12.5</td>
       <td>0.0</td>
-      <td>12.5</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 5</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>8.3</td>
+      <td>0.0</td>
+      <td>66.7</td>
+      <td>0.0</td>
       <td>25.0</td>
-      <td>75.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 6</th>
       <td>0.0</td>
+      <td>0.0</td>
+      <td>7.7</td>
+      <td>15.4</td>
       <td>76.9</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>15.4</td>
       <td>0.0</td>
-      <td>7.7</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 7</th>
       <td>0.0</td>
-      <td>75.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>62.5</td>
+      <td>12.5</td>
       <td>25.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 8</th>
       <td>0.0</td>
+      <td>11.1</td>
+      <td>11.1</td>
       <td>0.0</td>
-      <td>12.5</td>
-      <td>75.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>12.5</td>
+      <td>0.0</td>
+      <td>77.8</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>Storage 9</th>
+      <td>50.0</td>
+      <td>0.0</td>
+      <td>50.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>100.0</td>
     </tr>
   </tbody>
 </table>
@@ -582,52 +642,66 @@ cluster
   <tbody>
     <tr>
       <td>0</td>
-      <td>6</td>
-      <td>3</td>
-      <td>Storage 5</td>
-      <td>50.0%</td>
+      <td>9</td>
+      <td>2</td>
+      <td>Storage 9</td>
+      <td>77.8%</td>
     </tr>
     <tr>
       <td>1</td>
-      <td>33</td>
-      <td>6</td>
-      <td>Storage 6</td>
-      <td>30.3%</td>
+      <td>18</td>
+      <td>3</td>
+      <td>Storage 7</td>
+      <td>55.6%</td>
     </tr>
     <tr>
       <td>2</td>
-      <td>10</td>
-      <td>2</td>
-      <td>Baikal</td>
-      <td>90.0%</td>
+      <td>25</td>
+      <td>9</td>
+      <td>Storage 9</td>
+      <td>28.0%</td>
     </tr>
     <tr>
       <td>3</td>
-      <td>6</td>
-      <td>1</td>
-      <td>Storage 8</td>
-      <td>100.0%</td>
+      <td>15</td>
+      <td>5</td>
+      <td>Storage 1</td>
+      <td>26.7%</td>
     </tr>
     <tr>
       <td>4</td>
-      <td>10</td>
-      <td>5</td>
-      <td>Storage 1</td>
-      <td>40.0%</td>
+      <td>45</td>
+      <td>4</td>
+      <td>Storage 6</td>
+      <td>44.4%</td>
     </tr>
     <tr>
       <td>5</td>
+      <td>10</td>
+      <td>2</td>
+      <td>Storage 2</td>
+      <td>70.0%</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>7</td>
+      <td>2</td>
+      <td>Storage 5</td>
+      <td>85.7%</td>
+    </tr>
+    <tr>
+      <td>7</td>
       <td>8</td>
       <td>2</td>
-      <td>Storage 10</td>
-      <td>62.5%</td>
+      <td>Storage 8</td>
+      <td>87.5%</td>
     </tr>
     <tr>
-      <td>6</td>
-      <td>20</td>
-      <td>6</td>
-      <td>Storage 9</td>
-      <td>65.0%</td>
+      <td>8</td>
+      <td>4</td>
+      <td>1</td>
+      <td>Storage 10</td>
+      <td>100.0%</td>
     </tr>
   </tbody>
 </table>
@@ -656,52 +730,66 @@ cluster
   <tbody>
     <tr>
       <th>0</th>
-      <td>3.494</td>
-      <td>7.945</td>
-      <td>2.003</td>
-      <td>5.570</td>
+      <td>1.709</td>
+      <td>6.307</td>
+      <td>4.694</td>
+      <td>5.983</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>4.042</td>
-      <td>7.746</td>
-      <td>7.755</td>
-      <td>2.223</td>
+      <td>2.383</td>
+      <td>8.608</td>
+      <td>5.225</td>
+      <td>1.421</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>1.949</td>
-      <td>8.379</td>
-      <td>2.004</td>
-      <td>1.209</td>
+      <td>1.979</td>
+      <td>7.192</td>
+      <td>6.620</td>
+      <td>3.239</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>1.017</td>
-      <td>5.213</td>
-      <td>1.525</td>
-      <td>1.329</td>
+      <td>3.536</td>
+      <td>7.189</td>
+      <td>17.215</td>
+      <td>2.006</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>4.126</td>
-      <td>7.287</td>
-      <td>16.908</td>
-      <td>1.787</td>
+      <td>4.124</td>
+      <td>7.524</td>
+      <td>7.834</td>
+      <td>2.382</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>3.194</td>
-      <td>4.326</td>
-      <td>8.135</td>
-      <td>2.858</td>
+      <td>1.712</td>
+      <td>4.501</td>
+      <td>8.792</td>
+      <td>4.832</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>2.585</td>
-      <td>6.556</td>
-      <td>6.224</td>
-      <td>3.133</td>
+      <td>2.394</td>
+      <td>8.000</td>
+      <td>2.125</td>
+      <td>6.494</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1.001</td>
+      <td>5.530</td>
+      <td>1.534</td>
+      <td>1.394</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>3.766</td>
+      <td>4.292</td>
+      <td>5.796</td>
+      <td>2.640</td>
     </tr>
   </tbody>
 </table>
@@ -710,23 +798,23 @@ cluster
             <div class="section">
                 <h2>🗺️ Маппинг подклассов на кластеры</h2>
                 <div class="highlight">
-    <p><strong>Storage 1</strong> → Основной кластер <strong>4</strong></p>
-<p><strong>Storage 10</strong> → Основной кластер <strong>5</strong></p>
+    <p><strong>Storage 1</strong> → Основной кластер <strong>3</strong></p>
+<p><strong>Storage 10</strong> → Основной кластер <strong>8</strong></p>
 <p><strong>Storage 2</strong> → Основной кластер <strong>5</strong></p>
-<p><strong>Storage 3</strong> → Основной кластер <strong>6</strong></p>
-<p><strong>Storage 4</strong> → Основной кластер <strong>1</strong></p>
-<p><strong>Storage 5</strong> → Основной кластер <strong>1</strong></p>
-<p><strong>Storage 6</strong> → Основной кластер <strong>1</strong></p>
+<p><strong>Storage 3</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 4</strong> → Основной кластер <strong>4</strong></p>
+<p><strong>Storage 5</strong> → Основной кластер <strong>4</strong></p>
+<p><strong>Storage 6</strong> → Основной кластер <strong>4</strong></p>
 <p><strong>Storage 7</strong> → Основной кластер <strong>1</strong></p>
-<p><strong>Storage 8</strong> → Основной кластер <strong>3</strong></p>
-<p><strong>Storage 9</strong> → Основной кластер <strong>6</strong></p>
-<p><strong>Baikal</strong> → Основной кластер <strong>2</strong></p>
+<p><strong>Storage 8</strong> → Основной кластер <strong>7</strong></p>
+<p><strong>Storage 9</strong> → Основной кластер <strong>0</strong></p>
+<p><strong>Baikal</strong> → Основной кластер <strong>1</strong></p>
 
                 </div>
             </div>
             
             <div class="timestamp">
-                Отчет сгенерирован: 2025-11-11 12:11:47
+                Отчет сгенерирован: 2025-11-17 18:57:28
             </div>
         </div>
     </body>
