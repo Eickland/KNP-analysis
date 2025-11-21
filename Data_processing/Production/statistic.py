@@ -17,14 +17,19 @@ from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PA
 date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
 
+plt.rcParams['figure.dpi'] = 300
+
 for i, folder in enumerate(date_folder_list):
     
     fluo_path = Path.joinpath(folder, "Fluorescence")
     uv_path = Path.joinpath(folder, "UV","Individual_spectra")
 
     carbon_data = pd.read_excel(Path.joinpath(folder, 'C_org.xlsx'))
+    carbon_data.Sample = carbon_data.Sample.apply(lambda x: x+'-'+date_list[i])
+
     geodata = pd.read_excel(Path.joinpath(folder, 'GeoData.xlsx'))
-    
+    geodata.Sample = geodata.Sample.apply(lambda x: x+'-'+date_list[i])
+
     fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
     uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
 
@@ -34,11 +39,10 @@ for i, folder in enumerate(date_folder_list):
     })
 
     uv_data = ut.spectra_to_df(uv_spectra, {
-        "E2E3": uv.e2_e3, "epsilon": uv.epsilon
+        "E2E3": uv.e2_e3, "epsilon": uv.single_density
     })
     
-    parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac_2025.csv"))
-    parafac_data.rename(columns={parafac_data.columns[0]:"Sample"},inplace=True)
+    parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
 
     MainData = (uv_data.merge(carbon_data, on="Sample")
                     .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
@@ -53,4 +57,33 @@ for i, folder in enumerate(date_folder_list):
     
     MainData.set_index(["Class","Subclass","Sample"],inplace=True)
     
-    MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}','Documents',f'Исходные данные за {date_list[i]} год.xlsx'))
+    MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                                    'Documents',f'Исходные данные за {date_list[i]} год.xlsx'))
+    
+    MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Subclass',iqr_param=3,
+                                          filter_columns=['pH','eH','C_org'])
+    
+    MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                                    'Documents',f'Исходные данные без выбросов за {date_list[i]} год.xlsx'))
+    
+    sns.pairplot(MainData, hue = 'Subclass')
+    plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                      'Graphs',f'pairplot_{date_list[i]}.png')
+                )
+    plt.close()
+    
+
+    
+    if date_list[i] == '2025':
+        
+        for uvs in uv_spectra:
+            print(uvs.attrs['name'])
+                    
+        print(uv_data.head(50))
+        
+        print('carbon_data'+ f'{carbon_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
+        print('geodata'+ f'{geodata['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
+        print('fl_data'+ f'{fl_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
+        print('parafac_data'+ f'{parafac_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
+        print('uv_data'+ f'{uv_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')

@@ -124,4 +124,4 @@ def analyze_multiple_spectra_ratios(spectra_list, n_segments=12, cv_folds=5):
 num_segment = 40
 
 res = analyze_multiple_spectra_ratios(filtred_uv_spectra,n_segments=num_segment)
-res.to_excel(Path.joinpath(STAT_PATH,f'Статистика дескрипторов зеркального отражения, n={num_segment}.xlsx'))
+res.to_excel(Path.joinpath(STAT_PATH,'Reflect_descriptors',f'Статистика дескрипторов зеркального отражения, n={num_segment}.xlsx'))
