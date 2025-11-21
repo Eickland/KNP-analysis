@@ -42,7 +42,7 @@ for i, folder in enumerate(date_folder_list):
         
     for uv_spectra in uv_abs_spectra:
         
-        uv_spectra = uv_spectra.iloc[int(len(uv_spectra) * 5 / 100):]
+        uv_spectra = uv_spectra.iloc[20:]
         
         uv.plot_uv(uv_spectra)
         
@@ -54,7 +54,7 @@ for i, folder in enumerate(date_folder_list):
     
     if i == 1:
          
-        for uv_spectra in uv_refl_spectra:
+        for uv_spectra in uv_refl_spectra: # type: ignore
             
             uv.plot_uv(uv_spectra)
             

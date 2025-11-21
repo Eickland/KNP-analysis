@@ -35,5 +35,5 @@ for i, folder in enumerate(date_folder_list):
     
     if i == 1:
          
-        for uv_spectra in uv_refl_spectra:
+        for uv_spectra in uv_refl_spectra: # type: ignore
             uv_spectra.to_csv(uv_spectra.attrs['path'])

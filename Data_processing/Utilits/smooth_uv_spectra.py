@@ -70,10 +70,10 @@ def smooth_uv_spectrum_with_interpolation(df, window_size=3, threshold_factor=2.
             interpolator = CubicSpline(wavelengths, absorption)
         elif interpolation_method == 'linear':
             interpolator = interp1d(wavelengths, absorption, kind='linear', 
-                                  fill_value='extrapolate')
+                                  fill_value='extrapolate') # type: ignore
         else:  # polynomial
             interpolator = interp1d(wavelengths, absorption, kind='quadratic', 
-                                  fill_value='extrapolate')
+                                  fill_value='extrapolate') # type: ignore
         
         # Создаем более плотную сетку для интерполяции
         dense_wavelengths = np.linspace(wavelengths.min(), wavelengths.max(), 
@@ -83,7 +83,7 @@ def smooth_uv_spectrum_with_interpolation(df, window_size=3, threshold_factor=2.
         # Возвращаем к исходной сетке
         final_interpolator = interp1d(dense_wavelengths, dense_absorption, 
                                     kind='linear', bounds_error=False, 
-                                    fill_value='extrapolate')
+                                    fill_value='extrapolate') # type: ignore
         smoothed = final_interpolator(wavelengths)
         
     else:
@@ -138,10 +138,10 @@ def smooth_uv_spectrum_with_interpolation(df, window_size=3, threshold_factor=2.
                             interpolator = CubicSpline(x_normal, y_normal)
                         elif interpolation_method == 'linear':
                             interpolator = interp1d(x_normal, y_normal, kind='linear', 
-                                                  fill_value='extrapolate')
+                                                  fill_value='extrapolate') # type: ignore
                         else:
                             interpolator = interp1d(x_normal, y_normal, kind='quadratic', 
-                                                  fill_value='extrapolate')
+                                                  fill_value='extrapolate') # type: ignore
                         
                         # Интерполируем проблемный сегмент
                         segment_wavelengths = wavelengths[start_idx:end_idx+1]
