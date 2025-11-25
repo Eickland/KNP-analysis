@@ -25,7 +25,7 @@ KdePlotEnable = False
 HistPlotEnable = False
 ImPlotEnable = False
 CustomImplotEnable = True
-ScatterPlotEnable = False
+ScatterPlotEnable = True
 
 Choose_Date = '2024'
 
@@ -250,12 +250,20 @@ for i, folder in enumerate(date_folder_list):
     fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
     uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
 
+    uv_spectra_f = []
+    
+    for spectra in uv_spectra:
+        print(float(spectra.min().iloc[0]))
+        if float(spectra.min().iloc[0]) <= 0:
+            
+            spectra = spectra - spectra.min() + 0.00001
+        uv_spectra_f.append(spectra)
     fl_data = ut.spectra_to_df(fluo_spectra, {
         "Asm_350": fl.asm_350, "Asm_280": fl.asm_280,
         "FIX": fl.fluo_index, "HIX": fl.humin_index
     }, class_filter=None)
 
-    uv_data = ut.spectra_to_df(uv_spectra, {
+    uv_data = ut.spectra_to_df(uv_spectra_f, {
         "E2E3": uv.e2_e3, "epsilon": uv.single_density, "lambda": uv.lambda_UV
     }, class_filter=None)
     
