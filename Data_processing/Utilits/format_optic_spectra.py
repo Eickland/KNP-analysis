@@ -29,11 +29,14 @@ for i, folder in enumerate(date_folder_list):
     for fl_spectra in fluo_spectra:
             fl_spectra.to_csv(fl_spectra.attrs['path'])
 
-        
     for uv_spectra in uv_abs_spectra:
+        
+        uv_spectra = uv_spectra - uv_spectra.min()
+        
         uv_spectra.to_csv(uv_spectra.attrs['path'])
     
     if i == 1:
          
         for uv_spectra in uv_refl_spectra: # type: ignore
+            
             uv_spectra.to_csv(uv_spectra.attrs['path'])

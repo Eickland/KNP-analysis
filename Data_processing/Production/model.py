@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 import sys
+from itertools import combinations
 
 import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv 
@@ -17,7 +18,9 @@ uv_path = Path.joinpath(INIT_DATA_2025, "UV","Individual_spectra")
 wdir_savepath = Path.joinpath(Path.cwd(),"Server","Received_data","Model")
 
 carbon_data = pd.read_excel(Path.joinpath(INIT_DATA_2025, 'C_org.xlsx'))
+carbon_data.Sample = carbon_data.Sample.apply(lambda x: x+'-2024')
 geodata = pd.read_excel(Path.joinpath(INIT_DATA_2025, 'GeoData.xlsx'))
+geodata.Sample = geodata.Sample.apply(lambda x: x+'-2024')
 
 fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
 uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
@@ -45,34 +48,61 @@ numeric_cols = MainData_init.select_dtypes(include=['float']).columns
 MainData_init[numeric_cols] = MainData_init[numeric_cols].map(lambda x: float(f"{x:.4g}"))
 MainData_init.Sample = MainData_init.Sample.apply(lambda x: x+"-2025")
 
-MainData = ut.delete_eject_iqr(MainData_init,iqr_param=3,multi_index=False,columns=["Suva","Asm_280","C_org"])
+MainData = ut.filter_by_iqr_per_group(MainData_init,iqr_param=3,target_column='Subclass', filter_columns=["Suva","Asm_280","C_org"])
 MainData.set_index(["Class","Subclass","Sample"],inplace=True)
 
-#feature_columns = MainData.columns.to_list()[:-8]
-feature_columns = ['Component_1','Component_2','Component_3','Component_4','E2E3','Asm_280','Asm_350','HIX','FIX']
+feature_columns = MainData.columns.to_list()
+#feature_columns = ['Component_1','Component_2','Component_3','Component_4','E2E3','Asm_280','Asm_350','HIX','FIX']
 
 feature_columns_kmeans = feature_columns
 feature_columns_lda = feature_columns
 feature_columns_rf = feature_columns
 
+acc_lda = []
+acc_rf = []
+combinations_list = list(combinations(feature_columns, 5))
 
-res_lda = lda_analysis_with_subclasses(MainData[feature_columns_lda],save=True,vif_threshold = 100000,
-                                   output_html_path = str(
-                                       Path.joinpath(
-                                           Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{feature_columns_lda}.html")
-                                       )
-                                   )
 
-res_kmeans = kmeans_analysis_with_subclasses(MainData[feature_columns_kmeans],save=True,
-                                   output_html_path = str(
-                                       Path.joinpath(
-                                           Path.cwd(),"Server","Received_data","Model","Clustering","KM",f"KM_{feature_columns_kmeans}.html")
-                                       )
-                                   )
+res_lda = lda_analysis_with_subclasses(MainData[['Asm_280', 'Asm_350', 'Component_1', 'Component_2', 'Component_3']],save=True,vif_threshold = 100000,
+                                    output_html_path = str(
+                                        Path.joinpath(
+                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_('E2E3', 'C_org', 'Suva', 'pH', 'Component_3')_2024.html")
+                                        )
+                                    )
+raise(ValueError)
+for comb in combinations_list:
+    
+    comb = list(comb)
 
-res_rf = random_forest_analysis_with_subclasses(MainData[feature_columns_rf],save=True,
-                                   output_html_path = str(
-                                       Path.joinpath(
-                                           Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{feature_columns_rf}.html")
-                                       )
-                                   )
+    res_lda = lda_analysis_with_subclasses(MainData[comb],save=False,vif_threshold = 100000,
+                                    output_html_path = str(
+                                        Path.joinpath(
+                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{comb}_2024.html")
+                                        )
+                                    )
+
+    res_kmeans = kmeans_analysis_with_subclasses(MainData[comb],save=True,n_clusters=2,
+                                    output_html_path = str(
+                                        Path.joinpath(
+                                            Path.cwd(),"Server","Received_data","Model","Clustering","KM",f"KM_{comb}_2024.html")
+                                        )
+                                    )
+
+    res_rf = random_forest_analysis_with_subclasses(MainData[feature_columns_rf],save=False,
+                                    output_html_path = str(
+                                        Path.joinpath(
+                                            Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{comb}.html")
+                                        )
+                                    )
+
+    acc_lda.append(res_lda[-4])
+    acc_rf.append(res_rf[-1])
+    
+data = pd.DataFrame()
+
+data['LDA'] = acc_lda
+data['RF'] = acc_rf
+data['Feature'] = combinations_list
+
+data.sort_values('LDA',ascending=False).to_excel(Path.joinpath(
+                                            Path.cwd(),"Server","Received_data","Model","Output.xlsx"))

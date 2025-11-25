@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
+from itertools import combinations
 
 import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv
@@ -17,7 +18,12 @@ from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PA
 date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
 
-plt.rcParams['figure.dpi'] = 300
+PairPlotEnable = False
+BoxPlotEnable = False
+KdePlotEnable = False
+HistPlotEnable = False
+ImPlotEnable = False
+ScatterPlotEnable = True
 
 for i, folder in enumerate(date_folder_list):
     
@@ -36,22 +42,26 @@ for i, folder in enumerate(date_folder_list):
     fl_data = ut.spectra_to_df(fluo_spectra, {
         "Asm_350": fl.asm_350, "Asm_280": fl.asm_280,
         "FIX": fl.fluo_index, "HIX": fl.humin_index
-    })
+    }, class_filter=None)
 
     uv_data = ut.spectra_to_df(uv_spectra, {
-        "E2E3": uv.e2_e3, "epsilon": uv.single_density
-    })
+        "E2E3": uv.e2_e3, "epsilon": uv.single_density, "lambda": uv.lambda_UV
+    }, class_filter=None)
     
     parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
-
+    """
     MainData = (uv_data.merge(carbon_data, on="Sample")
                     .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
-                    .drop(columns=["epsilon"])
                     .merge(geodata[["Sample", "pH", "eH"]], on="Sample")
                     .merge(fl_data, on=["Sample", "Class", "Subclass"])
                     .merge(parafac_data,on=["Sample", "Subclass"])
                     )
-
+    """
+    MainData = (uv_data.merge(carbon_data, on="Sample")
+                    .assign(Suva=lambda x: 100*x.epsilon / x.C_org).merge(fl_data, on=["Sample", "Class", "Subclass"])
+                    .merge(parafac_data,on=["Sample", "Subclass"])
+                    )
+    
     numeric_cols = MainData.select_dtypes(include=['float']).columns
     MainData[numeric_cols] = MainData[numeric_cols].map(lambda x: float(f"{x:.4g}"))
     
@@ -60,30 +70,97 @@ for i, folder in enumerate(date_folder_list):
     MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
                                     'Documents',f'Исходные данные за {date_list[i]} год.xlsx'))
     
-    MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Subclass',iqr_param=3,
-                                          filter_columns=['pH','eH','C_org'])
+    MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Class',iqr_param=3,
+                                          filter_columns=['Asm_350','lambda'])
     
     MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
                                     'Documents',f'Исходные данные без выбросов за {date_list[i]} год.xlsx'))
     
-    sns.pairplot(MainData, hue = 'Subclass')
-    plt.savefig(
-        Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                      'Graphs',f'pairplot_{date_list[i]}.png')
-                )
-    plt.close()
+    if PairPlotEnable:
+        
+        fig, axes = plt.subplots(1,1,figsize=(12,12), dpi=600)
     
+        sns.pairplot(MainData, hue = 'Class')
+        plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs',f'pairplot_{date_list[i]}.png')
+                    )
+        plt.close()
+    
+    if BoxPlotEnable:
+    
+        for feature in numeric_cols:
+            
+            fig, axes = plt.subplots(1,1,figsize=(8,8))
+            
+            box = sns.boxplot(data = MainData.reset_index(), hue='Class', y=feature, ax=axes)
+            ut.add_median_labels(box)
+            
+            plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs','boxplot',f'boxplot_{feature}_{date_list[i]}.png')
+                    )
+            plt.close()
+            
+            
+    if KdePlotEnable:
+        
+        combinations_list = list(combinations(numeric_cols, 2))
+    
+        for feature_1, feature_2 in combinations_list:
+            
+            fig, axes = plt.subplots(1,1,figsize=(8,8))
+            
+            sns.kdeplot(data = MainData.reset_index(), hue='Class', y=feature_2,x = feature_1, ax=axes, alpha = 0.5)
+            
+            plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs','kdeplot',f'kdeplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                    )
+            plt.close()
 
+    if HistPlotEnable:
     
-    if date_list[i] == '2025':
+        for feature in numeric_cols:
+            
+            fig, axes = plt.subplots(1,1,figsize=(8,8))
+            #MainData.reset_index(inplace=True)
+            MainData = MainData[MainData['Class'] != 'Baikal']
+            sns.histplot(data = MainData, hue='Subclass', x=feature, ax=axes,
+                         multiple="stack",palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
+            
+            plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs','histplot',f'histplot_{feature}_{date_list[i]}.png')
+                    )
+            plt.close()
+            
+    if ImPlotEnable:
         
-        for uvs in uv_spectra:
-            print(uvs.attrs['name'])
-                    
-        print(uv_data.head(50))
+        combinations_list = list(combinations(numeric_cols, 2))
+    
+        for feature_1, feature_2 in combinations_list:
+                        
+            sns.lmplot(data = MainData.reset_index(), hue='Class', y=feature_1,x = feature_2)
+            
+            plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs','implot',f'implot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                    )
+            plt.close()
+            
+            
+    if ScatterPlotEnable:
         
-        print('carbon_data'+ f'{carbon_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
-        print('geodata'+ f'{geodata['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
-        print('fl_data'+ f'{fl_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
-        print('parafac_data'+ f'{parafac_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
-        print('uv_data'+ f'{uv_data['Sample'].isin(['ADOM-SL3-2-2025']).any()}')
+        combinations_list = list(combinations(numeric_cols, 2))
+    
+        for feature_1, feature_2 in combinations_list:
+            
+            fig, axes = plt.subplots(1,1,figsize=(8,8))
+            sns.scatterplot(data = MainData.reset_index(), hue='Class', y=feature_1,x = feature_2, ax=axes,palette='rainbow',style='Subclass')
+            
+            plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs','scatterplot',f'scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                    )
+            plt.close()

@@ -9,7 +9,9 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-FluoPlotEnable = False
+FluoPlotEnable = True
+
+plt.rcParams['figure.dpi'] = 300
 
 from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA_PATH
 
