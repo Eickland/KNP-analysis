@@ -9,7 +9,7 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-FluoPlotEnable = True
+FluoPlotEnable = False
 
 plt.rcParams['figure.dpi'] = 300
 
@@ -42,17 +42,52 @@ for i, folder in enumerate(date_folder_list):
                         )
             plt.close()
         
-    for uv_spectra in uv_abs_spectra:
+    z = 0    
+    for k,uv_spectra in enumerate(uv_abs_spectra):
+        
+        spectra_class = uv_spectra.attrs['subclass'] 
         
         uv_spectra = uv_spectra.iloc[20:]
         
-        uv.plot_uv(uv_spectra)
-        
-        plt.tight_layout()
-        plt.savefig(
-            Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Individual_spectra",f"{uv_spectra.attrs['name']}")
+        if k == 0:
+            
+            if k != len(uv_abs_spectra)-1:
+                fig,ax = plt.subplots(1,1,figsize=(8,8),dpi=300)
+                
+                next_spectra_class = uv_abs_spectra[k+1].attrs['subclass']
+                uv.plot_uv(uv_spectra,ax=ax, name = uv_spectra.attrs['name'])
+                z+=1
+        else:
+            
+            if k != len(uv_abs_spectra)-1:
+                
+                next_spectra_class = uv_abs_spectra[k+1].attrs['subclass']
+                
+            else:
+                plt.tight_layout()
+                plt.legend()
+                plt.savefig(
+                        Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Individual_spectra",f"{uv_spectra.attrs['subclass']}")
                     )
-        plt.close()
+                plt.close()
+                continue
+            
+            if (next_spectra_class != spectra_class): # type: ignore
+                print(True)
+                plt.tight_layout()
+                plt.legend()
+                plt.savefig(
+                        Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Individual_spectra",f"{uv_spectra.attrs['subclass']}")
+                    )
+                plt.close()
+                z = 0
+                fig,ax = plt.subplots(1,1,figsize=(8,8),dpi=300)
+            else:
+                if z < 5:
+                    print(z)
+                    uv.plot_uv(uv_spectra,ax=ax, name = uv_spectra.attrs['name']) # type: ignore
+                    z+=1
+               
     
     if i == 1:
          
