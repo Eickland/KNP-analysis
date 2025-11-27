@@ -10,7 +10,7 @@ import random
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-FluoPlotEnable = False
+FluoPlotEnable = True
 UVPlotEnable = False
 
 plt.rcParams['figure.dpi'] = 300
@@ -141,7 +141,7 @@ for i, folder in enumerate(date_folder_list):
         for fl_spectra in fluo_spectra:
             
             fl_spectra = fl.cut_spectra(fl_spectra,255,450,255,600)
-            fl.plot_heat_map(fl_spectra)
+            fl.plot_heat_map(fl_spectra.T)
             
             plt.tight_layout()
             plt.savefig(

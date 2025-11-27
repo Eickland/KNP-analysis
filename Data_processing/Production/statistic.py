@@ -20,13 +20,13 @@ date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
 
 PairPlotEnable = False
-BoxPlotEnable = False
+BoxPlotEnable = True
 KdePlotEnable = False
 HistPlotEnable = False
-ImPlotEnable = False
+ImPlotEnable = True
 CustomImplotEnable = False
-ScatterPlotEnable = False
-CustomScatterPlotEnable = False
+ScatterPlotEnable = True
+CustomScatterPlotEnable = True
 
 Choose_Date = '2024'
 
@@ -271,10 +271,6 @@ for i, folder in enumerate(date_folder_list):
     
     parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
     
-    
-    print(uv_data)
-    print(fl_data)
-    print(carbon_data)
     """
     MainData = (uv_data.merge(carbon_data, on="Sample")
                     .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
@@ -298,11 +294,12 @@ for i, folder in enumerate(date_folder_list):
     
     MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Class',iqr_param=1.5,
                                           filter_columns=['Asm_350',])
-    MainData.set_index(["Class","Subclass","Sample"],inplace=True)
+    MainData = MainData[MainData.Class != 'Lst']
+    #MainData.set_index(["Class","Subclass","Sample"],inplace=True)
     MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
                                     'Documents',f'Исходные данные без выбросов за {date_list[i]} год.xlsx'))
-    MainData.groupby(level=[0,1]).describe().T.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                                    'Documents',f'Статистика без выбросов за {date_list[i]} год.xlsx'))
+    #MainData.groupby(level=[0,1]).describe().T.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
+    #                                'Documents',f'Статистика без выбросов за {date_list[i]} год.xlsx'))
     
     if np.shape(np.unique(MainData.reset_index().Class)) == 1:
     
@@ -330,10 +327,9 @@ for i, folder in enumerate(date_folder_list):
         for feature in numeric_cols:
             
             
-            
             fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
-            MainData = MainData[MainData['Suva']<16]
-            box = sns.boxplot(data = MainData.reset_index(),
+            MainDataBox = MainData[MainData['Suva']<16]
+            box = sns.boxplot(data = MainDataBox.reset_index(),
                               hue='Class', y=feature, ax=axes)
             ut.add_median_labels(box)
             
