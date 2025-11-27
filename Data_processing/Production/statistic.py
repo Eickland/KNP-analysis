@@ -24,8 +24,9 @@ BoxPlotEnable = False
 KdePlotEnable = False
 HistPlotEnable = False
 ImPlotEnable = False
-CustomImplotEnable = True
-ScatterPlotEnable = True
+CustomImplotEnable = False
+ScatterPlotEnable = False
+CustomScatterPlotEnable = False
 
 Choose_Date = '2024'
 
@@ -253,21 +254,27 @@ for i, folder in enumerate(date_folder_list):
     uv_spectra_f = []
     
     for spectra in uv_spectra:
-        print(float(spectra.min().iloc[0]))
+        
         if float(spectra.min().iloc[0]) <= 0:
             
             spectra = spectra - spectra.min() + 0.00001
         uv_spectra_f.append(spectra)
+        
     fl_data = ut.spectra_to_df(fluo_spectra, {
         "Asm_350": fl.asm_350, "Asm_280": fl.asm_280,
         "FIX": fl.fluo_index, "HIX": fl.humin_index
     }, class_filter=None)
 
     uv_data = ut.spectra_to_df(uv_spectra_f, {
-        "E2E3": uv.e2_e3, "epsilon": uv.single_density, "lambda": uv.lambda_UV
+        "E2E3": uv.e2_e3, "epsilon": uv.single_density
     }, class_filter=None)
     
     parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
+    
+    
+    print(uv_data)
+    print(fl_data)
+    print(carbon_data)
     """
     MainData = (uv_data.merge(carbon_data, on="Sample")
                     .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
@@ -289,12 +296,13 @@ for i, folder in enumerate(date_folder_list):
     MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
                                     'Documents',f'Исходные данные за {date_list[i]} год.xlsx'))
     
-    MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Class',iqr_param=2.5,
-                                          filter_columns=['Asm_350','lambda'])
-    
+    MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Class',iqr_param=1.5,
+                                          filter_columns=['Asm_350',])
+    MainData.set_index(["Class","Subclass","Sample"],inplace=True)
     MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
                                     'Documents',f'Исходные данные без выбросов за {date_list[i]} год.xlsx'))
-    
+    MainData.groupby(level=[0,1]).describe().T.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                                    'Documents',f'Статистика без выбросов за {date_list[i]} год.xlsx'))
     
     if np.shape(np.unique(MainData.reset_index().Class)) == 1:
     
@@ -321,9 +329,12 @@ for i, folder in enumerate(date_folder_list):
     
         for feature in numeric_cols:
             
-            fig, axes = plt.subplots(1,1,figsize=(8,8))
             
-            box = sns.boxplot(data = MainData.reset_index(), hue='Class', y=feature, ax=axes)
+            
+            fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
+            MainData = MainData[MainData['Suva']<16]
+            box = sns.boxplot(data = MainData.reset_index(),
+                              hue='Class', y=feature, ax=axes)
             ut.add_median_labels(box)
             
             plt.savefig(
@@ -355,7 +366,7 @@ for i, folder in enumerate(date_folder_list):
             
             fig, axes = plt.subplots(1,1,figsize=(8,8))
             #MainData.reset_index(inplace=True)
-            MainData = MainData[MainData['Class'] != 'Baikal']
+            #MainData = MainData[MainData['Class'] != 'Baikal']
             sns.histplot(data = MainData, hue='Subclass', x=feature, ax=axes,
                          multiple="stack",palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
             
@@ -380,17 +391,17 @@ for i, folder in enumerate(date_folder_list):
             plt.close()
             
             
-    if ScatterPlotEnable:
+    if CustomScatterPlotEnable:
         
         combinations_list = list(combinations(numeric_cols, 2))
     
         for feature_1, feature_2 in combinations_list:
-            
-            create_hierarchical_scatter(MainData.reset_index(),first_type,second_type,feature_2,feature_1) # type: ignore
+            #print([MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])])
+            create_hierarchical_scatter(MainData,first_type,second_type,feature_2,feature_1) # type: ignore
             
             plt.savefig(
             Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','scatterplot',f'scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                        'Graphs','custom_scatterplot',f'custom_scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
                     )
             plt.close()
             
@@ -412,7 +423,7 @@ for i, folder in enumerate(date_folder_list):
             
             MainData.loc[MainData['Class'] == 'ADOM'] = MainData.loc[(MainData['E2E3'] > 2.1) & (MainData['Class'] == 'ADOM')]
             custom_data = MainData.reset_index().copy(deep=True)
-            custom_data.Class = custom_data.apply(lambda x: change_class(x),axis=1) # type: ignore
+            #custom_data.Class = custom_data.apply(lambda x: change_class(x),axis=1) # type: ignore
             
             custom_lmplot(custom_data,hue = first_type,x=feature_2,y=feature_1,no_trend_classes=['Lg'], # type: ignore
                           combined_trend_classes={'HS':['Coal','Peat','Soil']
@@ -423,4 +434,20 @@ for i, folder in enumerate(date_folder_list):
             Path.joinpath(STAT_PATH,f'{date_list[i]}',
                         'Graphs','custom_lmplot',f'custom_lmplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
                     )
-            plt.close()        
+            plt.close()
+            
+    if ScatterPlotEnable:
+                
+        combinations_list = list(combinations(numeric_cols, 2))
+    
+        for feature_1, feature_2 in combinations_list:
+            
+            fig, axes = plt.subplots(1,1,figsize=(8,8))
+            
+            sns.scatterplot(data = MainData[MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])], hue='Subclass', y=feature_2,x = feature_1, ax=axes, alpha = 1)
+            
+            plt.savefig(
+            Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                        'Graphs','scatterplot',f'scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                    )
+            plt.close()

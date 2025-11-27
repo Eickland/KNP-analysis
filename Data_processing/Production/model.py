@@ -18,6 +18,8 @@ def get_top_level(first_val, second_val):
         return 'ADOM'
     elif second_val == 'Lg':
         return 'Lg'
+    elif first_val == 'Baikal':
+        return 'Baikal'
     else:
         return 'HS'
 
@@ -45,16 +47,20 @@ uv_data = ut.spectra_to_df(uv_spectra, {
     "E2E3": uv.e2_e3, "epsilon": uv.single_density
 },class_filter=None)
 
+print(len(uv_spectra))
+print(len(fl_data))
+
 MainData_init = (uv_data.merge(carbon_data, on="Sample")
                 .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
                 .drop(columns=["epsilon"])
 #                .merge(geodata[["Sample", "pH", "eH"]], on="Sample")
                 .merge(fl_data, on=["Sample", "Class", "Subclass"])
-                .merge(parafac_data,on=["Sample", "Subclass"]))
+                .merge(parafac_data,on=["Sample", "Subclass"])
+)
 
 numeric_cols = MainData_init.select_dtypes(include=['float']).columns
 MainData_init[numeric_cols] = MainData_init[numeric_cols].map(lambda x: float(f"{x:.4g}"))
-MainData_init.Sample = MainData_init.Sample.apply(lambda x: x+"-2025")
+MainData_init.Sample = MainData_init.Sample.apply(lambda x: x+"-2024")
 
 MainData = ut.filter_by_iqr_per_group(MainData_init,iqr_param=1.5,target_column='Subclass', filter_columns=["Suva","Asm_280","C_org"])
 MainData.set_index(["Class","Subclass","Sample"],inplace=True)
@@ -85,10 +91,11 @@ new_index = pd.MultiIndex.from_arrays(
 MainData = MainData.set_index(new_index)
 
 
-res_lda = lda_analysis_with_subclasses(MainData[['E2E3', 'C_org', 'Asm_350', 'Asm_280']],save=True,vif_threshold = 100000,index_level=0,
+
+res_lda = lda_analysis_with_subclasses(MainData[['E2E3', 'HIX']],save=True,vif_threshold = 100000,index_level=0,
                                     output_html_path = str(
                                         Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{'E2E3', 'C_org', 'Asm_350', 'Asm_280'}_2024.html")
+                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{'E2E3', 'HIX'}_2024.html")
                                         )
                                     )
 
@@ -98,7 +105,7 @@ for comb in combinations_list:
     res_lda = lda_analysis_with_subclasses(MainData[comb],save=False,vif_threshold = 100000,index_level=0,
                                     output_html_path = str(
                                         Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{comb}_2024.html")
+                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{comb}_sub_2024.html")
                                         )
                                     )
     """

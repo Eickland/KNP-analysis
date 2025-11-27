@@ -20,7 +20,7 @@ from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA
 date_list = ["2024"]
 date_folder_list = [INIT_DATA_2024]
 
-def split_dataframes_by_class(dataframes: List[pd.DataFrame], type='class') -> List[List[pd.DataFrame]]:
+def split_dataframes_by_class(dataframes: List[pd.DataFrame], type='subclass') -> List[List[pd.DataFrame]]:
     """
     Разделяет список DataFrame по классам, указанным в df.attrs['class']
     
@@ -131,7 +131,7 @@ for i, folder in enumerate(date_folder_list):
     
     uv_toc_spectra = add_toc_to_spectra(uv_abs_spectra,carbon_data)
     
-    uv_class_spectra = split_dataframes_by_class(uv_toc_spectra,type='subclass')
+    uv_class_spectra = split_dataframes_by_class(uv_toc_spectra,type='class')
     
     if i == 1:
         uv_refl_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
@@ -158,12 +158,12 @@ for i, folder in enumerate(date_folder_list):
             uv_spectra = uv_spectra.iloc[20:]
             
             uv.plot_uv(uv_spectra,norm_by_TOC=True,name=uv_spectra.attrs['name'],ax=ax,title=False)
-            ax.set_title(uv_spectra.attrs['subclass'])
+            ax.set_title(uv_spectra.attrs['class'])
             ax.set_xlabel('Длина волны, нм')
         plt.legend()    
         plt.tight_layout()  
         plt.savefig(
-                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Grouped_spectra",f"{uv_spectra.attrs['subclass']}") # type: ignore
+                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Grouped_spectra",f"{uv_spectra.attrs['class']}") # type: ignore
                         )
         plt.close()
     
