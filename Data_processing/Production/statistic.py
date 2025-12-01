@@ -11,6 +11,17 @@ import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv
 import HumSpectra.utilits as ut
 
+
+# Установка размеров шрифтов для всех элементов
+plt.rcParams.update({
+    'font.size': 18,                    # Базовый размер шрифта
+    'axes.titlesize': 18,               # Заголовок осей
+    'axes.labelsize': 18,               # Метки осей
+    'xtick.labelsize': 16,              # Метки на оси X
+    'ytick.labelsize': 16,              # Метки на оси Y
+    'legend.fontsize': 16,              # Легенда
+    'figure.titlesize': 20              # Заголовок фигуры
+})
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
@@ -20,10 +31,10 @@ date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
 
 PairPlotEnable = False
-BoxPlotEnable = True
+BoxPlotEnable = False
 KdePlotEnable = False
 HistPlotEnable = False
-ImPlotEnable = True
+ImPlotEnable = False
 CustomImplotEnable = False
 ScatterPlotEnable = True
 CustomScatterPlotEnable = True
@@ -281,7 +292,7 @@ for i, folder in enumerate(date_folder_list):
     """
     MainData = (uv_data.merge(carbon_data, on="Sample")
                     .assign(Suva=lambda x: 100*x.epsilon / x.C_org).merge(fl_data, on=["Sample", "Class", "Subclass"])
-                    .merge(parafac_data,on=["Sample", "Subclass"])
+                    .merge(parafac_data,on=["Sample", "Subclass","Class"])
                     )
     
     numeric_cols = MainData.select_dtypes(include=['float']).columns
@@ -293,13 +304,13 @@ for i, folder in enumerate(date_folder_list):
                                     'Documents',f'Исходные данные за {date_list[i]} год.xlsx'))
     
     MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Class',iqr_param=1.5,
-                                          filter_columns=['Asm_350',])
-    MainData = MainData[MainData.Class != 'Lst']
-    #MainData.set_index(["Class","Subclass","Sample"],inplace=True)
+                                          filter_columns=['Asm_350'])
+    #MainData = MainData[MainData.Class != 'Lst']
+    MainData.set_index(["Class","Subclass","Sample"],inplace=True)
     MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
                                     'Documents',f'Исходные данные без выбросов за {date_list[i]} год.xlsx'))
-    #MainData.groupby(level=[0,1]).describe().T.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
-    #                                'Documents',f'Статистика без выбросов за {date_list[i]} год.xlsx'))
+    MainData.groupby(level=[0,1]).describe().T.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                                   'Documents',f'Статистика без выбросов за {date_list[i]} год.xlsx'))
     
     if np.shape(np.unique(MainData.reset_index().Class)) == 1:
     
@@ -394,7 +405,7 @@ for i, folder in enumerate(date_folder_list):
     
         for feature_1, feature_2 in combinations_list:
             #print([MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])])
-            create_hierarchical_scatter(MainData,first_type,second_type,feature_2,feature_1) # type: ignore
+            create_hierarchical_scatter(MainData.reset_index(),first_type,second_type,feature_2,feature_1) # type: ignore
             
             plt.savefig(
             Path.joinpath(STAT_PATH,f'{date_list[i]}',
@@ -439,10 +450,17 @@ for i, folder in enumerate(date_folder_list):
     
         for feature_1, feature_2 in combinations_list:
             
-            fig, axes = plt.subplots(1,1,figsize=(8,8))
+            fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
             
-            sns.scatterplot(data = MainData[MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])], hue='Subclass', y=feature_2,x = feature_1, ax=axes, alpha = 1)
-            
+            sns.scatterplot(data = MainData, hue='Class', y=feature_2,x = feature_1, ax=axes, alpha = 1,legend=False)
+            """
+            plt.legend(
+            bbox_to_anchor=(1.05, 1),  # Позиция относительно axes (1,1 - правый верхний угол)
+                    loc='upper left',          # Якорь легенды
+                    borderaxespad=0.0          # Отступ от axes
+                )
+            """    
+            plt.tight_layout()
             plt.savefig(
             Path.joinpath(STAT_PATH,f'{date_list[i]}',
                         'Graphs','scatterplot',f'scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
