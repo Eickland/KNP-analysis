@@ -63,6 +63,7 @@ MainData_init[numeric_cols] = MainData_init[numeric_cols].map(lambda x: float(f"
 MainData_init.Sample = MainData_init.Sample.apply(lambda x: x+"-2024")
 
 MainData = ut.filter_by_iqr_per_group(MainData_init,iqr_param=1.5,target_column='Subclass', filter_columns=["Suva","Asm_280","C_org"])
+MainData = MainData[MainData.Class != 'Lst']
 MainData.set_index(["Class","Subclass","Sample"],inplace=True)
 
 feature_columns = MainData.columns.to_list()
@@ -90,15 +91,20 @@ new_index = pd.MultiIndex.from_arrays(
 
 MainData = MainData.set_index(new_index)
 
+feature_custom_list = ['E2E3', 'Asm_350', 'Component_2']
 
-
-res_lda = lda_analysis_with_subclasses(MainData[['E2E3', 'HIX']],save=True,vif_threshold = 100000,index_level=0,
+res_lda = lda_analysis_with_subclasses(MainData[feature_custom_list],save=True,vif_threshold = 100000,index_level=0,
                                     output_html_path = str(
                                         Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{'E2E3', 'HIX'}_2024.html")
+                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{feature_custom_list}_2024.html")
                                         )
                                     )
-
+res_rf = random_forest_analysis_with_subclasses(MainData[feature_custom_list],save=True,index_level=0,
+                                    output_html_path = str(
+                                        Path.joinpath(
+                                            Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{feature_custom_list}.html")
+                                        )
+                                    )
 for comb in combinations_list:
     
     comb = list(comb)
@@ -116,22 +122,22 @@ for comb in combinations_list:
                                         )
                                     )
     
-
-    res_rf = random_forest_analysis_with_subclasses(MainData[feature_columns_rf],save=False,target_column='Class',
+    """
+    res_rf = random_forest_analysis_with_subclasses(MainData[feature_columns_rf],save=False,index_level=0,
                                     output_html_path = str(
                                         Path.joinpath(
                                             Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{comb}.html")
                                         )
                                     )
-    """
+    
     acc_lda.append(res_lda[-4])
-#    acc_rf.append(res_rf[-1])
+    acc_rf.append(res_rf[-1])
     
 data = pd.DataFrame()
 
 data['LDA'] = acc_lda
-#data['RF'] = acc_rf
+data['RF'] = acc_rf
 data['Feature'] = combinations_list
 
-data.sort_values('LDA',ascending=False).to_excel(Path.joinpath(
+data.sort_values('RF',ascending=False).to_excel(Path.joinpath(
                                             Path.cwd(),"Server","Received_data","Model",f"Output_{num_fearure_max}.xlsx"))
