@@ -132,10 +132,33 @@ for i, folder in enumerate(date_folder_list):
     uv_toc_spectra = add_toc_to_spectra(uv_abs_spectra,carbon_data)
     
     uv_class_spectra = split_dataframes_by_class(uv_toc_spectra,type='class')
+    fluo_subclass_spectra = split_dataframes_by_class(fluo_spectra,type= 'class')
     
     if i == 1:
         uv_refl_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
-
+    fig,ax = plt.subplots(1,1,figsize=(7,7),dpi=300)
+    for fluo_subclass in fluo_subclass_spectra: 
+        random_element = random.sample(fluo_subclass, 1)[0]
+        if random_element.attrs['subclass'] in ['Lg','Lst','SHA','SFA','SHF','PFA','PHF','PHA','CHF','CHA']:
+        
+            fl_spectra = fl.cut_spectra(random_element,255,450,255,600)
+            fl_spectra = ut.normilize_by_max(fl_spectra)
+            fl_spectra_280 = fl.cut_raman_spline(em_wvs=fl_spectra.index.to_numpy(),fl=fl_spectra[280].to_numpy(),exc_wv=280)
+            ax.plot(fl_spectra.index.to_numpy(),fl_spectra_280,label=random_element.attrs['name'])
+            
+            ax.set_title('Спектр флуоресценции при 280 нм длины волны возбуждения')
+            ax.set_ylabel('Интенсивность')
+            ax.set_xlabel('Длина волны испускания, нм')
+            ax.set_ylim((0.0,1.1))
+        else:
+            continue
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(
+                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","Fluorescence","280_nm",f"Карты+байкал")
+                        )
+    plt.close()
+    
     if FluoPlotEnable:
     
         for fl_spectra in fluo_spectra:
@@ -149,23 +172,27 @@ for i, folder in enumerate(date_folder_list):
                         )
             plt.close()
         
+    fig,ax = plt.subplots(1,1,figsize=(7,7),dpi=300) 
     for uv_class_list in uv_class_spectra:
         
-        random_elements = random.sample(uv_class_list, 4)
-        fig,ax = plt.subplots(1,1,figsize=(7,7),dpi=300)     
-        for uv_spectra in random_elements:
+        random_elements = random.sample(uv_class_list, 1)
+        if random_elements[0].attrs['class'] in ['ADOM','Baikal']:
             
-            uv_spectra = uv_spectra.iloc[20:]
-            
-            uv.plot_uv(uv_spectra,norm_by_TOC=True,name=uv_spectra.attrs['name'],ax=ax,title=False)
-            ax.set_title(uv_spectra.attrs['class'])
-            ax.set_xlabel('Длина волны, нм')
-        plt.legend()    
-        plt.tight_layout()  
-        plt.savefig(
-                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Grouped_spectra",f"{uv_spectra.attrs['class']}") # type: ignore
+            continue
+        else:
+            for uv_spectra in random_elements:
+                
+                uv_spectra = uv_spectra.iloc[20:]
+                
+                uv.plot_uv(uv_spectra,norm_by_TOC=True,name=uv_spectra.attrs['name'],ax=ax,title=False)
+                ax.set_title('Нормированный спектр поглощения')
+                ax.set_xlabel('Длина волны, нм')
+    plt.legend()    
+    plt.tight_layout()  
+    plt.savefig(
+                Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Grouped_spectra",f"Нормированный спектр поглощения_2") # type: ignore
                         )
-        plt.close()
+    plt.close()
     
     if UVPlotEnable:
              
