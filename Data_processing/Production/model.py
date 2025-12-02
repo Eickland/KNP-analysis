@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv 
 import HumSpectra.utilits as ut
-from HumSpectra.hum_statistic import lda_analysis_with_subclasses, random_forest_analysis_with_subclasses, kmeans_analysis_with_subclasses
+from HumSpectra.hum_statistic import lda_classifaction, random_forest_classification
 import matplotlib as mpl
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
@@ -139,49 +139,44 @@ new_index = pd.MultiIndex.from_arrays(
 
 MainData = MainData.set_index(new_index)
 
+feature_comb = ['Asm_280', 'FIX', 'Component_2']
+
+res_lda = lda_classifaction(MainData[feature_comb],index_level=1,
+                                        output_html_path = str(
+                                            Path.joinpath(
+                                                Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{feature_comb}.html")
+                                            )
+                                        )
+
+res_rf = random_forest_classification(MainData[feature_comb],index_level=1,
+                                        output_html_path = str(
+                                            Path.joinpath(
+                                                Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{feature_comb}.html")
+                                            )
+                                        )
+
+"""
 feature_custom_listD2 = [['E2E3', 'Suva', 'Asm_280', 'FIX'],['Asm_350', 'Asm_280', 'Component_1', 'Component_2'],['Suva', 'Asm_280', 'FIX', 'Component_2'],['C_org', 'Asm_350', 'Asm_280', 'Component_2'],
                          ['Suva', 'Asm_350', 'Asm_280', 'Component_2'],['Asm_350', 'Asm_280', 'Component_2'],['Asm_280', 'FIX', 'Component_2'],['C_org', 'Asm_350', 'Component_1'],
                          ['C_org', 'Suva', 'FIX'],['Asm_280', 'HIX'],['Asm_350', 'Asm_280'],['Asm_280', 'FIX'],['Component_2', 'Asm_280'],['C_org', 'Suva', 'Asm_280'],['C_org', 'Suva', 'Asm_280', 'FIX']]
 
 for feature_comb in [['Asm_280', 'FIX', 'Component_2']]:
-    res_lda = lda_analysis_with_subclasses(MainData[feature_comb],save=True,vif_threshold = 100000,index_level=1,
+    res_lda = lda_classifaction(MainData[feature_comb],index_level=1,threshold = 10000,
                                         output_html_path = str(
                                             Path.joinpath(
                                                 Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{feature_comb}_oldclass_2024.html")
                                             )
                                         )
-    plt.rcParams.update({
-    'font.size': 18,                    # Базовый размер шрифта
-    'axes.titlesize': 18,               # Заголовок осей
-    'axes.labelsize': 18,               # Метки осей
-    'xtick.labelsize': 16,              # Метки на оси X
-    'ytick.labelsize': 16,              # Метки на оси Y
-    'legend.fontsize': 16,              # Легенда
-    'figure.titlesize': 20              # Заголовок фигуры
-})
-    fig, ax = plt.subplots(1,1,figsize=(8,8),dpi=300)
-    sns.scatterplot(data=res_lda[0],hue='Class',x='LDA_Component_1',y='LDA_Component_2',ax=ax,legend=False)
-    """
-    plt.legend(
-    bbox_to_anchor=(1.05, 1),  # Позиция относительно axes (1,1 - правый верхний угол)
-    loc='upper left',          # Якорь легенды
-    borderaxespad=0.0          # Отступ от axes
-)
-    """
-    plt.tight_layout()
-    plt.savefig(r"C:\Users\mnbv2\Downloads\Figure_1.png")
-    plt.close()
 
 for comb in combinations_list:
     
     comb = list(comb)
-    res_lda = lda_analysis_with_subclasses(MainData[comb],save=False,vif_threshold = 100000,index_level=1,
+    res_lda = lda_classifaction(MainData[comb],vif_threshold = 1,index_level=1,
                                     output_html_path = str(
                                         Path.joinpath(
                                             Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{comb}_sub_2024.html")
                                         )
                                     )
-    """
     res_kmeans = kmeans_analysis_with_subclasses(MainData[comb],save=True,n_clusters=2,
                                     output_html_path = str(
                                         Path.joinpath(
@@ -189,8 +184,7 @@ for comb in combinations_list:
                                         )
                                     )
     
-    """
-    res_rf = random_forest_analysis_with_subclasses(MainData[feature_columns_rf],save=False,index_level=0,
+    res_rf = random_forest_classification(MainData[feature_columns_rf],index_level=0,
                                     output_html_path = str(
                                         Path.joinpath(
                                             Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{comb}.html")
@@ -209,3 +203,4 @@ data['Feature'] = combinations_list
 data.sort_values('LDA_macro',ascending=False).to_excel(Path.joinpath(
                                             Path.cwd(),"Server","Received_data","Model",f"Output_{num_fearure_max}.xlsx"))
 
+"""

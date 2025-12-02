@@ -15,3 +15,5 @@ CLUSTERING_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Clustering'
 PARAFAC_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Parafac'
 STAT_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Statistics'
 SPECTRA_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Spectra'
+
+CACHE_DATA_PATH = PROJECT_ROOT / 'Initial_data' / 'data_cache'
