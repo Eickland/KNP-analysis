@@ -10,7 +10,7 @@ from sklearn.linear_model import LinearRegression
 import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv
 import HumSpectra.utilits as ut
-
+from HumSpectra.sample import SampleCollection
 
 # Установка размеров шрифтов для всех элементов
 plt.rcParams.update({
@@ -25,10 +25,8 @@ plt.rcParams.update({
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PATH, PARAFAC_PATH
+from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PATH, PARAFAC_PATH,CACHE_DATA_PATH
 
-date_list = ["2024","2025"]
-date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
 
 PairPlotEnable = False
 BoxPlotEnable = False
@@ -37,9 +35,7 @@ HistPlotEnable = False
 ImPlotEnable = False
 CustomImplotEnable = False
 ScatterPlotEnable = True
-CustomScatterPlotEnable = True
-
-Choose_Date = '2024'
+CustomScatterPlotEnable = False
 
 
 def create_hierarchical_scatter(df, class_col, subclass_col, x_col, y_col,s=70):
@@ -245,224 +241,150 @@ def custom_lmplot(data, x, y, hue, no_trend_classes=None, combined_trend_classes
     
     return fig
 
-for i, folder in enumerate(date_folder_list):
-    
-    if Choose_Date != date_list[i]:
-        continue
-    
-    fluo_path = Path.joinpath(folder, "Fluorescence")
-    uv_path = Path.joinpath(folder, "UV","Individual_spectra")
+collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
+collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
+print(f'Коллекция загружена, к-во образцов: {len(collection.samples)}')
 
-    carbon_data = pd.read_excel(Path.joinpath(folder, 'C_org.xlsx'))
-    carbon_data.Sample = carbon_data.Sample.apply(lambda x: x+'-'+date_list[i])
+data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.5)
+data.dropna(inplace=True)
 
-    geodata = pd.read_excel(Path.joinpath(folder, 'GeoData.xlsx'))
-    geodata.Sample = geodata.Sample.apply(lambda x: x+'-'+date_list[i])
+MainData = ut.filter_by_iqr_per_group(data,iqr_param=1.5,target_column='Subclass', filter_columns=["asm_350",'Suva'])
+numeric_cols = MainData.select_dtypes(include=['float']).columns
+MainData[numeric_cols] = MainData[numeric_cols].map(lambda x: float(f"{x:.4g}"))
 
-    fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
-    uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
+MainData = MainData[MainData['Class'] == 'ADOM']
 
-    uv_spectra_f = []
-    
-    for spectra in uv_spectra:
-        
-        if float(spectra.min().iloc[0]) <= 0:
-            
-            spectra = spectra - spectra.min() + 0.00001
-        uv_spectra_f.append(spectra)
-        
-    fl_data = ut.spectra_to_df(fluo_spectra, {
-        "Asm_350": fl.asm_350, "Asm_280": fl.asm_280,
-        "FIX": fl.fluo_index, "HIX": fl.humin_index
-    }, class_filter=None)
+MainData.set_index(["Class","Subclass","Sample"],inplace=True)
 
-    uv_data = ut.spectra_to_df(uv_spectra_f, {
-        "E2E3": uv.e2_e3, "epsilon": uv.single_density
-    }, class_filter=None)
+if PairPlotEnable:
     
-    parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
-    
-    """
-    MainData = (uv_data.merge(carbon_data, on="Sample")
-                    .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
-                    .merge(geodata[["Sample", "pH", "eH"]], on="Sample")
-                    .merge(fl_data, on=["Sample", "Class", "Subclass"])
-                    .merge(parafac_data,on=["Sample", "Subclass"])
-                    )
-    """
-    MainData = (uv_data.merge(carbon_data, on="Sample")
-                    .assign(Suva=lambda x: 100*x.epsilon / x.C_org).merge(fl_data, on=["Sample", "Class", "Subclass"])
-                    .merge(parafac_data,on=["Sample", "Subclass","Class"])
-                    )
-    
-    numeric_cols = MainData.select_dtypes(include=['float']).columns
-    MainData[numeric_cols] = MainData[numeric_cols].map(lambda x: float(f"{x:.4g}"))
-    
-    MainData.set_index(["Class","Subclass","Sample"],inplace=True)
-    
-    MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                                    'Documents',f'Исходные данные за {date_list[i]} год.xlsx'))
-    
-    MainData = ut.filter_by_iqr_per_group(MainData.reset_index(),'Class',iqr_param=1.5,
-                                          filter_columns=['Asm_350'])
-    #MainData = MainData[MainData.Class != 'Lst']
-    MainData.set_index(["Class","Subclass","Sample"],inplace=True)
-    MainData.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                                    'Documents',f'Исходные данные без выбросов за {date_list[i]} год.xlsx'))
-    MainData.groupby(level=[0,1]).describe().T.to_excel(Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                                   'Documents',f'Статистика без выбросов за {date_list[i]} год.xlsx'))
-    
-    if np.shape(np.unique(MainData.reset_index().Class)) == 1:
-    
-        first_type = 'Subclass'
-    
-    else:
-        
-        first_type = 'Class'
-        second_type = 'Subclass'
-    
-    
-    if PairPlotEnable:
-        
-        fig, axes = plt.subplots(1,1,figsize=(12,12), dpi=600)
-    
-        sns.pairplot(MainData, hue = 'Class')
-        plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs',f'pairplot_{date_list[i]}.png')
-                    )
-        plt.close()
-    
-    if BoxPlotEnable:
-    
-        for feature in numeric_cols:
-            
-            MainData = MainData[MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])]
-            
-            fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
-            MainDataBox = MainData[MainData['Suva']<16]
-            box = sns.boxplot(data = MainDataBox.reset_index(),
-                              hue='Class', y=feature, ax=axes)
-            ut.add_median_labels(box)
-            
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','boxplot',f'boxplot_{feature}_{date_list[i]}.png')
-                    )
-            plt.close()
-            
-            
-    if KdePlotEnable:
-        
-        combinations_list = list(combinations(numeric_cols, 2))
-    
-        for feature_1, feature_2 in combinations_list:
-            
-            fig, axes = plt.subplots(1,1,figsize=(8,8))
-            
-            sns.kdeplot(data = MainData.reset_index(), hue='Class', y=feature_2,x = feature_1, ax=axes, alpha = 0.5)
-            
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','kdeplot',f'kdeplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
-                    )
-            plt.close()
+    fig, axes = plt.subplots(1,1,figsize=(12,12), dpi=600)
 
-    if HistPlotEnable:
-    
-        for feature in numeric_cols:
-            
-            fig, axes = plt.subplots(1,1,figsize=(8,8))
-            #MainData.reset_index(inplace=True)
-            #MainData = MainData[MainData['Class'] != 'Baikal']
-            sns.histplot(data = MainData, hue='Subclass', x=feature, ax=axes,
-                         multiple="stack",palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
-            
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','histplot',f'histplot_{feature}_{date_list[i]}.png')
-                    )
-            plt.close()
-            
-    if ImPlotEnable:
-        
-        combinations_list = list(combinations(numeric_cols, 2))
-    
-        for feature_1, feature_2 in combinations_list:
-                        
-            sns.lmplot(data = MainData.reset_index(), hue='Class', y=feature_1,x = feature_2)
-            
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','implot',f'implot_{feature_1} vs {feature_2}_{date_list[i]}.png')
-                    )
-            plt.close()
-            
-            
-    if CustomScatterPlotEnable:
-        
-        combinations_list = list(combinations(numeric_cols, 2))
-    
-        for feature_1, feature_2 in combinations_list:
-            #print([MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])])
-            create_hierarchical_scatter(MainData.reset_index(),first_type,second_type,feature_2,feature_1) # type: ignore
-            
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','custom_scatterplot',f'custom_scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
-                    )
-            plt.close()
-            
-    def change_class(row):
-        
-        if row['Subclass'] == 'SFA':
-            return 'ADOM'
-        
-        elif row['Subclass'] == 'PFA':
-            return 'ADOM'
-        else:
-            return row['Class']      
-            
-    if CustomImplotEnable:
-        
-        combinations_list = list(combinations(numeric_cols, 2))
-    
-        for feature_1, feature_2 in combinations_list:
-            
-            MainData.loc[MainData['Class'] == 'ADOM'] = MainData.loc[(MainData['E2E3'] > 2.1) & (MainData['Class'] == 'ADOM')]
-            custom_data = MainData.reset_index().copy(deep=True)
-            #custom_data.Class = custom_data.apply(lambda x: change_class(x),axis=1) # type: ignore
-            
-            custom_lmplot(custom_data,hue = first_type,x=feature_2,y=feature_1,no_trend_classes=['Lg'], # type: ignore
-                          combined_trend_classes={'HS':['Coal','Peat','Soil']
-                                                    },
-                          show_equations=True) # type: ignore
-            
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','custom_lmplot',f'custom_lmplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
-                    )
-            plt.close()
-            
-    if ScatterPlotEnable:
-                
-        combinations_list = list(combinations(numeric_cols, 2))
-    
-        for feature_1, feature_2 in combinations_list:
-            
-            fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
-            
-            sns.scatterplot(data = MainData, hue='Class', y=feature_2,x = feature_1, ax=axes, alpha = 1,legend=False)
-            """
-            plt.legend(
-            bbox_to_anchor=(1.05, 1),  # Позиция относительно axes (1,1 - правый верхний угол)
-                    loc='upper left',          # Якорь легенды
-                    borderaxespad=0.0          # Отступ от axes
+    sns.pairplot(MainData, hue = 'Class')
+    plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs',f'pairplot_{date_list[i]}.png')
                 )
-            """    
-            plt.tight_layout()
-            plt.savefig(
-            Path.joinpath(STAT_PATH,f'{date_list[i]}',
-                        'Graphs','scatterplot',f'scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
-                    )
-            plt.close()
+    plt.close()
+
+if BoxPlotEnable:
+
+    for feature in numeric_cols:
+        
+        MainData = MainData[MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])]
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
+        MainDataBox = MainData[MainData['Suva']<16]
+        box = sns.boxplot(data = MainDataBox.reset_index(),
+                            hue='Class', y=feature, ax=axes)
+        ut.add_median_labels(box)
+        
+        plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs','boxplot',f'boxplot_{feature}_{date_list[i]}.png')
+                )
+        plt.close()
+             
+if KdePlotEnable:
+    
+    combinations_list = list(combinations(numeric_cols, 2))
+
+    for feature_1, feature_2 in combinations_list:
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8))
+        
+        sns.kdeplot(data = MainData.reset_index(), hue='Class', y=feature_2,x = feature_1, ax=axes, alpha = 0.5)
+        
+        plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs','kdeplot',f'kdeplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                )
+        plt.close()
+
+if HistPlotEnable:
+
+    for feature in numeric_cols:
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8))
+        #MainData.reset_index(inplace=True)
+        #MainData = MainData[MainData['Class'] != 'Baikal']
+        sns.histplot(data = MainData, hue='Subclass', x=feature, ax=axes,
+                        multiple="stack",palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
+        
+        plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs','histplot',f'histplot_{feature}_{date_list[i]}.png')
+                )
+        plt.close()
+        
+if ImPlotEnable:
+    
+    combinations_list = list(combinations(numeric_cols, 2))
+
+    for feature_1, feature_2 in combinations_list:
+                    
+        sns.lmplot(data = MainData.reset_index(), hue='Class', y=feature_1,x = feature_2)
+        
+        plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs','implot',f'implot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                )
+        plt.close()
+               
+if CustomScatterPlotEnable:
+    
+    combinations_list = list(combinations(numeric_cols, 2))
+
+    for feature_1, feature_2 in combinations_list:
+        #print([MainData['Subclass'].isin(['Storage 2','Storage 3','Storage 4','Storage 5','Storage 6','Storage 7','Baikal'])])
+        create_hierarchical_scatter(MainData.reset_index(),first_type,second_type,feature_2,feature_1) # type: ignore
+        
+        plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs','custom_scatterplot',f'custom_scatterplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                )
+        plt.close()  
+        
+if CustomImplotEnable:
+    
+    combinations_list = list(combinations(numeric_cols, 2))
+
+    for feature_1, feature_2 in combinations_list:
+        
+        MainData.loc[MainData['Class'] == 'ADOM'] = MainData.loc[(MainData['E2E3'] > 2.1) & (MainData['Class'] == 'ADOM')]
+        custom_data = MainData.reset_index().copy(deep=True)
+        #custom_data.Class = custom_data.apply(lambda x: change_class(x),axis=1) # type: ignore
+        
+        custom_lmplot(custom_data,hue = first_type,x=feature_2,y=feature_1,no_trend_classes=['Lg'], # type: ignore
+                        combined_trend_classes={'HS':['Coal','Peat','Soil']
+                                                },
+                        show_equations=True) # type: ignore
+        
+        plt.savefig(
+        Path.joinpath(STAT_PATH,f'{date_list[i]}',
+                    'Graphs','custom_lmplot',f'custom_lmplot_{feature_1} vs {feature_2}_{date_list[i]}.png')
+                )
+        plt.close()
+        
+if ScatterPlotEnable:
+            
+    combinations_list = list(combinations(numeric_cols, 2))
+
+    for feature_1, feature_2 in combinations_list:
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=100)
+        
+        sns.scatterplot(data = MainData, hue='Subclass', y=feature_2,x = feature_1, ax=axes, alpha = 1,legend=True)
+        """
+        plt.legend(
+        bbox_to_anchor=(1.05, 1),  # Позиция относительно axes (1,1 - правый верхний угол)
+                loc='upper left',          # Якорь легенды
+                borderaxespad=0.0          # Отступ от axes
+            )
+        """    
+        plt.tight_layout()
+        plt.savefig(
+        Path.joinpath(STAT_PATH,'Correlations',
+                    'Graphs','scatterplot',f'scatterplot_{feature_1} vs {feature_2}.png')
+                )
+        plt.close()

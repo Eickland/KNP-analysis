@@ -9,8 +9,8 @@ INIT_DATA_2025 = PROJECT_ROOT / 'Initial_data' / '2025'
 
 RECEIVED_DATA = PROJECT_ROOT / 'Server' / 'Received_data'
 
-CLASSIFICATION_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Classification'
-CLUSTERING_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Clustering'
+CLASSIFICATION_PATH = PROJECT_ROOT / 'Server' / 'Received_data' /'Model'/ 'Classification'
+CLUSTERING_PATH = PROJECT_ROOT / 'Server' / 'Received_data'/'Model' / 'Clustering'
 
 PARAFAC_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Parafac'
 STAT_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Statistics'

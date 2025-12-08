@@ -3,30 +3,33 @@ import matplotlib.pyplot as plt
 import sys
 import numpy as np
 from HumSpectra.parafac import EEMDataLoader, ComponentVisualizer
+from HumSpectra.sample import SampleCollection, split_by_category
+import HumSpectra.utilits as ut
 
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, PARAFAC_PATH
+from Data_processing.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
-# Установка размеров шрифтов для всех элементов
-plt.rcParams.update({
-    'font.size': 18,                    # Базовый размер шрифта
-    'axes.titlesize': 20,               # Заголовок осей
-    'axes.labelsize': 18,               # Метки осей
-    'xtick.labelsize': 16,              # Метки на оси X
-    'ytick.labelsize': 16,              # Метки на оси Y
-    'legend.fontsize': 16,              # Легенда
-    'figure.titlesize': 20              # Заголовок фигуры
-})
+collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
+collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
 
+data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.5)
+data.dropna(inplace=True)
 
+MainData = ut.filter_by_iqr_per_group(data,iqr_param=1.5,target_column='Subclass', filter_columns=["Asm_280",'Asm_350','HIX','FIX'])
+white_names_list = list(MainData['Sample'].values)
 
-fluo_paths_2024 = Path.joinpath(INIT_DATA_2024, "Fluorescence")
-fluo_paths_2025 = Path.joinpath(INIT_DATA_2025, "Fluorescence")
+filter_collection = []
+
+for name, sample in collection.samples.items():
+    
+    if sample.sample_class == 'ADOM':
+        
+        filter_collection.append(sample)
 
 loader = EEMDataLoader()
-eem_tensor,em_waves,ex_waves,sp_names = loader.load_eem_data(data_folders=[fluo_paths_2024,fluo_paths_2025])
+eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection)
 data_info = loader.get_data_info()
 
 analyzer = ComponentVisualizer(n_components=3)

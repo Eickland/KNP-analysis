@@ -8,199 +8,146 @@ import matplotlib.pyplot as plt
 import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv 
 import HumSpectra.utilits as ut
-from HumSpectra.hum_statistic import lda_classifaction, random_forest_classification
+from HumSpectra.hum_statistic import lda_classification, random_forest_classification
 import matplotlib as mpl
+from sklearn.preprocessing import StandardScaler
+
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PATH, PARAFAC_PATH
+from HumSpectra.sample import SampleCollection
+from Data_processing.config_paths import CACHE_DATA_PATH, CLASSIFICATION_PATH
 
-# Установка размеров шрифтов для всех элементов
+GrindBestCombEnabled = False
+SingleModelEnabled = True
 
-def create_hierarchical_scatter(df, class_col, subclass_col, x_col, y_col,s=70):
-    """
-    Использует HSV цветовое пространство для лучшего контроля насыщенности
-    """
-    fig, ax = plt.subplots(figsize=(10, 8))
-    
-    classes = df[class_col].unique()
-    subclasses = df[subclass_col].unique()
-    
-    # Насыщенные цвета в HSV пространстве
-    base_hues = np.linspace(0, 0.9, len(classes))  # Равномерное распределение оттенков
-    markers = ['o', 's', 'D', '^', 'v', '<', '>', 'p', '*', 'X']
-    
-    for i, class_val in enumerate(classes):
-        class_data = df[df[class_col] == class_val]
-        hue = base_hues[i]
-        
-        # Создаем градиент варьируя насыщенность (S) и значение (V) в HSV
-        saturations = np.linspace(0.8, 0.4, len(subclasses))  # От насыщенного к менее насыщенному
-        values = np.linspace(0.9, 0.7, len(subclasses))       # От яркого к темному
-        
-        for j, subclass_val in enumerate(subclasses):
-            subclass_data = class_data[class_data[subclass_col] == subclass_val]
-            
-            if len(subclass_data) > 0:
-                # Конвертируем HSV в RGB
-                hsv_color = (hue, saturations[j], values[j])
-                rgb_color = mpl.colors.hsv_to_rgb(hsv_color) # type: ignore
-                
-                ax.scatter(subclass_data[x_col], subclass_data[y_col],
-                          color=rgb_color,
-                          marker=markers[j % len(markers)],
-                          s=s,
-                          label=f'{class_val} - {subclass_val}',
-                          edgecolor='black', 
-                          linewidth=1.0,
-                          alpha=0.85)
-    
-    #ax.legend(bbox_to_anchor=(1, 1), loc='upper right')
-    ax.set_xlabel(x_col)
-    ax.set_ylabel(y_col)
-    ax.grid(True, alpha=0.2)
-    plt.tight_layout()
-    return fig, ax
+collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
+collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
+print(f'Коллекция загружена, к-во образцов: {len(collection.samples)}')
 
-def get_top_level(first_val, second_val):
-    if first_val == 'ADOM':
-        return 'ADOM'
-    elif second_val == 'Lg':
-        return 'Lg'
-    elif first_val == 'Baikal':
-        return 'Baikal'
-    else:
-        return 'HS'
+data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.25)
+data.dropna(inplace=True)
 
-fluo_path = Path.joinpath(INIT_DATA_2024, "Fluorescence")
-uv_path = Path.joinpath(INIT_DATA_2024, "UV","Individual_spectra")
-wdir_savepath = Path.joinpath(Path.cwd(),"Server","Received_data","Model")
+MainData = ut.filter_by_iqr_per_group(data,iqr_param=2.5,target_column='Subclass', filter_columns=["asm_350",'Suva'])
 
-carbon_data = pd.read_excel(Path.joinpath(INIT_DATA_2024, 'C_org.xlsx'))
-carbon_data.Sample = carbon_data.Sample.apply(lambda x: x+'-2024')
-geodata = pd.read_excel(Path.joinpath(INIT_DATA_2024, 'GeoData.xlsx'))
-geodata.Sample = geodata.Sample.apply(lambda x: x+'-2024')
+# Создаем маски для разных условий
+mask_adom_2025 = (MainData['sample_class'] == 'ADOM') & (MainData['Sample'].str[-4:] == '2025')
 
-fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
-uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
+# Отделяем строки с Baikal для случайного разделения
+baikal_df = MainData[MainData['sample_class'] == 'Baikal'].copy()
 
-parafac_data = pd.read_csv(Path.joinpath(Path.cwd(),"Server","Received_data","Parafac","data","parafac.csv"))
-parafac_data.rename(columns={parafac_data.columns[0]:"Sample"},inplace=True)
+# Случайно делим Baikal строки на две части
+np.random.seed(42)  # для воспроизводимости
+baikal_indices = baikal_df.index.tolist()
+np.random.shuffle(baikal_indices)
+half_baikal_count = len(baikal_indices) // 2
 
-fl_data = ut.spectra_to_df(fluo_spectra, {
-    "Asm_350": fl.asm_350, "Asm_280": fl.asm_280,
-    "FIX": fl.fluo_index, "HIX": fl.humin_index
-},class_filter=None)
+# Индексы Baikal для первой части
+baikal_part1_indices = baikal_indices[:half_baikal_count]
 
-uv_data = ut.spectra_to_df(uv_spectra, {
-    "E2E3": uv.e2_e3, "epsilon": uv.single_density
-},class_filter=None)
+# Создаем финальную маску для первой части
+mask_part1 = mask_adom_2025 | MainData.index.isin(baikal_part1_indices)
 
+# Разделяем DataFrame
+test_data = MainData[mask_part1].copy()
+train_data = MainData[~mask_part1].copy()
 
-MainData_init = (uv_data.merge(carbon_data, on="Sample")
-                .assign(Suva=lambda x: 100*x.epsilon / x.C_org)
-                .drop(columns=["epsilon"])
-#                .merge(geodata[["Sample", "pH", "eH"]], on="Sample")
-                .merge(fl_data, on=["Sample", "Class", "Subclass"])
-                .merge(parafac_data,on=["Sample", "Subclass",'Class'])
-)
-
-numeric_cols = MainData_init.select_dtypes(include=['float']).columns
-MainData_init[numeric_cols] = MainData_init[numeric_cols].map(lambda x: float(f"{x:.4g}"))
-#MainData_init.Sample = MainData_init.Sample.apply(lambda x: x+"-2024")
-
-MainData = ut.filter_by_iqr_per_group(MainData_init,iqr_param=1.5,target_column='Subclass', filter_columns=["Suva","Asm_280","C_org"])
-print(MainData)
-#MainData = MainData[MainData.Class != 'Lst']
 MainData.set_index(["Class","Subclass","Sample"],inplace=True)
+train_data.set_index(["Class","Subclass","Sample"],inplace=True)
+test_data.set_index(["Class","Subclass","Sample"],inplace=True)
 
-feature_columns = MainData.columns.to_list()
-#feature_columns = ['Component_1','Component_2','Component_3','Component_4','E2E3','Asm_280','Asm_350','HIX','FIX']
+if GrindBestCombEnabled:
 
-feature_columns_kmeans = feature_columns
-feature_columns_lda = feature_columns
-feature_columns_rf = feature_columns
+    feature_columns = MainData.select_dtypes(include=['float']).columns
 
-acc_lda = []
-acc_rf = []
-num_fearure_max = 1
-combinations_list = list(combinations(feature_columns, num_fearure_max))
-
-new_level_values = [
-    get_top_level(first_val, second_val) 
-    for first_val, second_val, _ in MainData.index
-]
-
-# Добавляем новый уровень
-new_index = pd.MultiIndex.from_arrays(
-    [new_level_values] + [MainData.index.get_level_values(i) for i in range(MainData.index.nlevels)],
-    names=['Overclass', 'Class', 'Subclass','Sample']
-)
-
-MainData = MainData.set_index(new_index)
-
-feature_comb = ['Asm_280', 'FIX', 'Component_2']
-
-res_lda = lda_classifaction(MainData[feature_comb],index_level=1,
-                                        output_html_path = str(
-                                            Path.joinpath(
-                                                Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{feature_comb}.html")
-                                            )
-                                        )
-
-res_rf = random_forest_classification(MainData[feature_comb],index_level=1,
-                                        output_html_path = str(
-                                            Path.joinpath(
-                                                Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{feature_comb}.html")
-                                            )
-                                        )
-
-"""
-feature_custom_listD2 = [['E2E3', 'Suva', 'Asm_280', 'FIX'],['Asm_350', 'Asm_280', 'Component_1', 'Component_2'],['Suva', 'Asm_280', 'FIX', 'Component_2'],['C_org', 'Asm_350', 'Asm_280', 'Component_2'],
-                         ['Suva', 'Asm_350', 'Asm_280', 'Component_2'],['Asm_350', 'Asm_280', 'Component_2'],['Asm_280', 'FIX', 'Component_2'],['C_org', 'Asm_350', 'Component_1'],
-                         ['C_org', 'Suva', 'FIX'],['Asm_280', 'HIX'],['Asm_350', 'Asm_280'],['Asm_280', 'FIX'],['Component_2', 'Asm_280'],['C_org', 'Suva', 'Asm_280'],['C_org', 'Suva', 'Asm_280', 'FIX']]
-
-for feature_comb in [['Asm_280', 'FIX', 'Component_2']]:
-    res_lda = lda_classifaction(MainData[feature_comb],index_level=1,threshold = 10000,
-                                        output_html_path = str(
-                                            Path.joinpath(
-                                                Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{feature_comb}_oldclass_2024.html")
-                                            )
-                                        )
-
-for comb in combinations_list:
+    accuracy_lda = []
+    weight_accuracy_lda=[]
+    ADOM_accuracy_lda = []
+    ADOM_accuracy_lda_cross_val = []
     
-    comb = list(comb)
-    res_lda = lda_classifaction(MainData[comb],vif_threshold = 1,index_level=1,
-                                    output_html_path = str(
-                                        Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model","Classification","LDA",f"LDA_{comb}_sub_2024.html")
-                                        )
-                                    )
-    res_kmeans = kmeans_analysis_with_subclasses(MainData[comb],save=True,n_clusters=2,
-                                    output_html_path = str(
-                                        Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model","Clustering","KM",f"KM_{comb}_2024.html")
-                                        )
-                                    )
+    accuracy_rf = []
+    weight_accuracy_rf=[]
+    ADOM_accuracy_rf = []
+    ADOM_accuracy_rf_cross_val = []    
     
-    res_rf = random_forest_classification(MainData[feature_columns_rf],index_level=0,
-                                    output_html_path = str(
-                                        Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model","Classification","RF",f"RF_{comb}.html")
-                                        )
-                                    )
+    combinations_2Dlist = []
+    count_feature_list = []
+
+    num_fearure_list = [1,2,3]
+    target = 1
     
-    acc_lda.append(res_lda[-4])
-    acc_rf.append(res_rf[-1])
     
-data = pd.DataFrame()
+    num_iterations = 0
+    k = 1
+    
+    for num_fearure_max in num_fearure_list:
+        num_iterations += len(list(combinations(feature_columns, num_fearure_max)))
 
-data['LDA_macro'] = acc_lda
-data['RF'] = acc_rf
-data['Feature'] = combinations_list
+    for num_fearure_max in num_fearure_list:
+    
+        combinations_list = list(combinations(feature_columns, num_fearure_max))
 
-data.sort_values('LDA_macro',ascending=False).to_excel(Path.joinpath(
-                                            Path.cwd(),"Server","Received_data","Model",f"Output_{num_fearure_max}.xlsx"))
+        for feature_comb in combinations_list:
+            
+            print(f'{k}/{num_iterations}')
+            print(feature_comb)
+            feature_comb = list(feature_comb)
 
-"""
+            res_lda = lda_classification(MainData[feature_comb],index_level=target,cv_dataset=test_data[feature_comb],external_validation=False)
+            weight_accuracy_lda.append(res_lda[-4])
+            accuracy_lda.append(res_lda[-5])
+            #ADOM_accuracy_lda.append(res_lda[-2]['precision'].loc['ADOM'])
+            #ADOM_accuracy_lda_cross_val.append(res_lda[-1]['classification_report']['ADOM']['precision']) # type: ignore
+
+            res_rf = random_forest_classification(MainData[feature_comb],index_level=target,cv_dataset=test_data[feature_comb],external_validation=False)
+            weight_accuracy_rf.append(res_rf[-4])
+            accuracy_rf.append(res_rf[-5])
+            #ADOM_accuracy_rf.append(res_rf[-2]['precision'].loc['ADOM'])
+            #ADOM_accuracy_rf_cross_val.append(res_rf[-1]['classification_report']['ADOM']['precision']) # type: ignore      
+                  
+            combinations_2Dlist.append(feature_comb)
+            count_feature_list.append(num_fearure_max)
+            
+            k+=1
+            
+    accuracy_data = pd.DataFrame()
+    
+    accuracy_data['LDA_weight_accuracy'] = weight_accuracy_lda
+    accuracy_data['LDA_accuracy'] = accuracy_lda    
+    accuracy_data['RF_weight_accuracy'] = weight_accuracy_rf
+    accuracy_data['RF_accuracy'] = accuracy_rf
+    
+    #accuracy_data['ADOM_accuracy_lda'] = ADOM_accuracy_lda
+    #accuracy_data['ADOM_accuracy_lda_CV'] = ADOM_accuracy_lda_cross_val
+    #accuracy_data['ADOM_accuracy_rf'] = ADOM_accuracy_rf
+    #accuracy_data['ADOM_accuracy_rf_CV'] = ADOM_accuracy_rf_cross_val
+    
+    accuracy_data['feature'] = combinations_2Dlist
+    accuracy_data['num_feature'] = count_feature_list
+
+    main_model_output_save_path = Path.joinpath(Path.cwd(),"Server","Received_data","Model",f"Model_accuracy_ADOM_subclass_2025_cross_val.xlsx")
+    
+    accuracy_data.sort_values('LDA_weight_accuracy',ascending=False).to_excel(main_model_output_save_path)
+
+if SingleModelEnabled:
+    
+    feature_comb = ['Component_3', 'Suva', 'r412_547']
+
+    res_lda = lda_classification(MainData[feature_comb],index_level=1,
+                                output_html_path=str(Path.joinpath(CLASSIFICATION_PATH,"LDA",f"LDA_{feature_comb}.html"),
+                                                    ),
+                                external_validation=False,
+                                cv_dataset=test_data[feature_comb]
+                                                    )
+
+    res_rf = random_forest_classification(MainData[feature_comb],index_level=1,
+                                output_html_path=str(Path.joinpath(CLASSIFICATION_PATH,"RF",f"RF_{feature_comb}.html"),
+                                                    ),
+                                external_validation=False,
+                                cv_dataset=test_data[feature_comb]
+                                                    )
+
+#model_data = pd.read_excel(Path.joinpath(Path.cwd(),"Server","Received_data","Model",f"Model_accuracy_cross-val.xlsx"))
+
+
+

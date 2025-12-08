@@ -20,104 +20,6 @@ from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA
 date_list = ["2024"]
 date_folder_list = [INIT_DATA_2024]
 
-def split_dataframes_by_class(dataframes: List[pd.DataFrame], type='subclass') -> List[List[pd.DataFrame]]:
-    """
-    Разделяет список DataFrame по классам, указанным в df.attrs['class']
-    
-    Args:
-        dataframes: Список DataFrame для разделения
-        
-    Returns:
-        List[List[pd.DataFrame]]: Список списков DataFrame, сгруппированных по классам
-    """
-    # Собираем все уникальные классы
-    all_classes = set()
-    
-    for df in dataframes:
-        if hasattr(df, 'attrs') and type in df.attrs:
-            class_value = df.attrs[type]
-            # Если класс - это список, добавляем все элементы
-            if isinstance(class_value, list):
-                all_classes.update(class_value)
-            else:
-                all_classes.add(class_value)
-    
-    # Создаем словарь для группировки
-    class_groups = {cls: [] for cls in all_classes}
-    
-    # Распределяем DataFrame по классам
-    for df in dataframes:
-        if hasattr(df, 'attrs') and type in df.attrs:
-            class_value = df.attrs[type]
-            
-            if isinstance(class_value, list):
-                # Если несколько классов, добавляем DataFrame во все соответствующие группы
-                for cls in class_value:
-                    if cls in class_groups:
-                        class_groups[cls].append(df)
-            else:
-                # Если один класс, добавляем в соответствующую группу
-                if class_value in class_groups:
-                    class_groups[class_value].append(df)
-    
-    # Преобразуем словарь в список списков
-    return list(class_groups.values())
-
-def add_toc_to_spectra(spectra: List[pd.DataFrame], 
-                               toc_table: pd.DataFrame, 
-                               name_col: str = 'Sample', 
-                               toc_col: str = 'C_org',
-                               verbose: bool = True) -> List[pd.DataFrame]:
-    """
-    Добавляет параметр 'TOC' в attrs каждого спектра и удаляет спектры без TOC
-    
-    Args:
-        spectra: Список DataFrame спектров
-        toc_table: DataFrame с таблицей соответствия имен и значений TOC
-        name_col: Название столбца с именами в toc_table (по умолчанию 'Sample')
-        toc_col: Название столбца со значениями TOC в toc_table (по умолчанию 'C_org')
-        verbose: Выводить ли информацию об удаленных спектрах
-        
-    Returns:
-        List[pd.DataFrame]: Список спектров с добавленным параметром 'TOC' в attrs
-                            (спектры без TOC удалены)
-    """
-    
-    # Создаем словарь для быстрого поиска TOC по имени
-    toc_dict = dict(zip(toc_table[name_col], toc_table[toc_col]))
-    
-    updated_spectra = []
-    removed_count = 0
-    
-    for spectrum in spectra:
-        # Создаем копию DataFrame
-        spectrum_copy = spectrum.copy()
-        
-        # Проверяем наличие атрибута 'name'
-        if hasattr(spectrum, 'attrs') and 'name' in spectrum.attrs:
-            spectrum_name = spectrum.attrs['name']
-            
-            # Ищем соответствие в таблице TOC
-            if spectrum_name in toc_dict:
-                # Создаем копию attrs и добавляем TOC
-                new_attrs = spectrum.attrs.copy()
-                new_attrs['TOC'] = toc_dict[spectrum_name]
-                spectrum_copy.attrs = new_attrs
-                updated_spectra.append(spectrum_copy)
-            else:
-                removed_count += 1
-                if verbose:
-                    print(f"Удален спектр: '{spectrum_name}' - TOC не найден")
-        else:
-            removed_count += 1
-            if verbose:
-                print(f"Удален спектр: отсутствует атрибут 'name'")
-    
-    if verbose:
-        print(f"Обработка завершена. Удалено спектров: {removed_count}, осталось: {len(updated_spectra)}")
-    
-    return updated_spectra
-
 carbon_data = pd.read_excel(Path.joinpath(INIT_DATA_2024, 'C_org.xlsx'))
 carbon_data.Sample = carbon_data.Sample.apply(lambda x: x+'-2024')
 
@@ -129,10 +31,10 @@ for i, folder in enumerate(date_folder_list):
     fluo_spectra = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
     uv_abs_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
     
-    uv_toc_spectra = add_toc_to_spectra(uv_abs_spectra,carbon_data)
+    uv_toc_spectra = uv.add_toc_to_spectra(uv_abs_spectra,carbon_data)
     
-    uv_class_spectra = split_dataframes_by_class(uv_toc_spectra,type='class')
-    fluo_subclass_spectra = split_dataframes_by_class(fluo_spectra,type= 'class')
+    uv_class_spectra = ut.split_dataframes_by_class(uv_toc_spectra,type='class')
+    fluo_subclass_spectra = ut.split_dataframes_by_class(fluo_spectra,type= 'class')
     
     if i == 1:
         uv_refl_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
@@ -198,12 +100,11 @@ for i, folder in enumerate(date_folder_list):
              
         for uv_spectra in uv_abs_spectra:
             
-            uv_spectra = uv_spectra.iloc[20:]
+            uv_spectra = uv_spectra.iloc[30:]
             
             uv.plot_uv(uv_spectra)
             
             plt.tight_layout()
-            
             plt.savefig(
                 Path.joinpath(SPECTRA_PATH,f"{date_list[i]}","UV","Absorption","Individual_spectra",f"{uv_spectra.attrs['name']}")
                         )
