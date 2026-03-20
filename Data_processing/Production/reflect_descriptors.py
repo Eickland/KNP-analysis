@@ -13,7 +13,7 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-from Data_processing.config_paths import INIT_DATA_2025, STAT_PATH
+from Data_processing.Utilits.config_paths import INIT_DATA_2025, STAT_PATH
 
 uv_path = Path.joinpath(INIT_DATA_2025, "UV","Individual_spectra")
 uv_spectra = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")

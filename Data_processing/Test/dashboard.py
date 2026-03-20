@@ -12,7 +12,7 @@ from pathlib import Path
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PATH, PARAFAC_PATH
+from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, STAT_PATH, PARAFAC_PATH
 
 def plot_dataframe_dashboard(df, figsize=(20, 15), cmap='coolwarm'):
     """

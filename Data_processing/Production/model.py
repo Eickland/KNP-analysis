@@ -16,7 +16,7 @@ project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
 from HumSpectra.sample import SampleCollection
-from Data_processing.config_paths import CACHE_DATA_PATH, CLASSIFICATION_PATH
+from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, CLASSIFICATION_PATH
 
 GrindBestCombEnabled = False
 SingleModelEnabled = True

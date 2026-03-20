@@ -327,7 +327,7 @@ def smooth_uv_spectrum_peaks(df, window_size=5, threshold_factor=2.0, min_peak_h
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA_PATH
+from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA_PATH
 
 date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]

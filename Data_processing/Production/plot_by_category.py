@@ -12,7 +12,7 @@ from HumSpectra.sample import SampleCollection, split_by_category
 
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
-from Data_processing.config_paths import SPECTRA_PATH, CACHE_DATA_PATH
+from Data_processing.Utilits.config_paths import SPECTRA_PATH, CACHE_DATA_PATH
 
 plt.rcParams.update({
     'font.size': 10,                    # Базовый размер шрифта

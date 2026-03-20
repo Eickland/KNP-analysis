@@ -15,7 +15,7 @@ UVPlotEnable = False
 
 plt.rcParams['figure.dpi'] = 300
 
-from Data_processing.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA_PATH
+from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, SPECTRA_PATH
 
 date_list = ["2024"]
 date_folder_list = [INIT_DATA_2024]
