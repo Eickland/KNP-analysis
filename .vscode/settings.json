@@ -1,4 +1,7 @@
 {
     "dataWrangler.defaultViewingFilterOptions": "basic",
-    "dataWrangler.grid.defaultColumnWidth": 100
+    "dataWrangler.grid.defaultColumnWidth": 100,
+    "python.analysis.extraPaths": [
+        "./Data_processing/Production"
+    ]
 }
