@@ -11,6 +11,48 @@ import HumSpectra.fluorescence as fl
 import HumSpectra.ultraviolet as uv
 import HumSpectra.utilits as ut
 from HumSpectra.sample import SampleCollection
+
+feature_names_translate_dict = {
+    'org_carbon' : 'Орг. углерод, мг/л'
+}
+
+def hist_plot_default(MainData, path, target_column, save=False):
+    
+    numeric_cols = MainData.select_dtypes(include=['float']).columns
+    
+    for feature in numeric_cols:
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8))
+        sns.histplot(data = MainData, hue=target_column, x=feature, ax=axes,
+                        multiple="stack",palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
+        
+        if feature == 'org_carbon':
+            plt.xlabel(feature_names_translate_dict['org_carbon'])
+            plt.title(f'Распределение {feature_names_translate_dict['org_carbon']}')
+                
+        if save:
+            plt.savefig(path + fr'\{feature}.png')
+            plt.close()
+             
+def swarm_plot_default(MainData, path, target_column, save=False):
+    
+    numeric_cols = MainData.select_dtypes(include=['float']).columns
+    
+    for feature in numeric_cols:
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8))
+        sns.swarmplot(data = MainData, hue=target_column, y=feature, ax=axes,
+                        palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
+        
+        if feature == 'org_carbon':
+            plt.ylabel(feature_names_translate_dict['org_carbon'])
+            plt.title(f'Распределение {feature_names_translate_dict['org_carbon']}')
+            
+        if save:
+            plt.savefig(path + fr'\{feature}.png')
+            plt.close()            
+            
+                   
     
 def scatter_plot_default(MainData, path, target_column, save=False, label_class=None):
     
