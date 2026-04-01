@@ -17,6 +17,10 @@ from sklearn.svm import OneClassSVM
 
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
+plt.rcParams['axes.titlesize'] = 24
+
+plt.rcParams['xtick.labelsize'] = 24
+plt.rcParams['axes.labelsize'] = 20
 
 from HumSpectra.sample import SampleCollection
 from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, CLASSIFICATION_PATH
@@ -331,9 +335,9 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     ax1.axhline(0.5, color='red', linestyle='--', alpha=0.7, label='Случайное угадывание (0.5)')
     ax1.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
-    ax1.set_title('Деградация чувствительности (Recall)', fontsize=14)
-    ax1.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=12)
-    ax1.set_ylabel('Доля распознанных аномалий (Recall)', fontsize=12)
+    ax1.set_title('Деградация чувствительности (Recall)', fontsize=20)
+    ax1.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=20)
+    ax1.set_ylabel('Доля распознанных аномалий (Recall)', fontsize=20)
     ax1.set_ylim(-0.05, 1.05)
     ax1.legend(loc='lower left')
 
@@ -344,9 +348,9 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     ax2.axhline(0, color='black', linestyle='-', alpha=0.8, label='Граница нормы (0.0)')
     ax2.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
-    ax2.set_title('Приближение к эталонной сигнатуре (Decision Function)', fontsize=14)
-    ax2.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=12)
-    ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=12)
+    ax2.set_title('Приближение к эталонной сигнатуре', fontsize=16)
+    ax2.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=20)
+    ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=20)
     ax2.legend(loc='upper left')
 
     plt.tight_layout()
@@ -362,7 +366,7 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
 # ==========================================
 # ЗАПУСК (Вставьте этот блок после вашего SearchOn)
 # ==========================================
-choosed_combinations = ['Asm_280', 'org_carbon', 'Component_1', 'Component_3', 'FIX']
+
 
 # Запускаем анализ
 sensitivity_df = analyze_carbon_sensitivity(

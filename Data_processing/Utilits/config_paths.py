@@ -12,7 +12,7 @@ RECEIVED_DATA = PROJECT_ROOT / 'Server' / 'Received_data'
 CLASSIFICATION_PATH = PROJECT_ROOT / 'Server' / 'Received_data' /'Model'/ 'Classification'
 CLUSTERING_PATH = PROJECT_ROOT / 'Server' / 'Received_data'/'Model' / 'Clustering'
 
-PARAFAC_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Parafac'
+PARAFAC_PATH = PROJECT_ROOT  / 'Received_data' / 'Parafac'
 STAT_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Statistics'
 SPECTRA_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Spectra'
 

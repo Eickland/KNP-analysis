@@ -17,6 +17,10 @@ from Data_processing.Utilits.config_paths import SPECTRA_PATH, CACHE_DATA_PATH
 plt.rcParams.update({
     'font.size': 10,                    # Базовый размер шрифта
 })
+plt.rcParams['axes.titlesize'] = 24
+plt.rcParams['ytick.labelsize'] = 20
+plt.rcParams['xtick.labelsize'] = 24
+plt.rcParams['axes.labelsize'] = 20
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
@@ -27,8 +31,8 @@ for sample_name, sample in collection.samples.items():
     print(sample.sample_subclass)
 
 by_subclass = split_by_category(collection, category='subclass')
-
-sample_list = collection.filter_by_tags_all('cutted_fluo','smooth_uv_refl','smooth_uv_abs','org_carbon')
+sample_list = collection.samples
+sample_list = collection.filter_by_tags_all('2025')
 print(f'Коллекция профильтрвана, к-во образцов: {len(sample_list)}')
 
 by_subclass = split_by_category(sample_list, category='subclass')
@@ -51,6 +55,7 @@ for i in range(9):
     col = i % 3
     
     for k in range(3):
+        print(subclass_list[i])
         subclass_list[i][1][k].uv_vis_absorption_smooth.attrs['TOC'] = subclass_list[i][1][k].org_carbon #type: ignore
         uv.plot_uv(subclass_list[i][1][k].uv_vis_absorption_smooth, #type: ignore
                   ax=axes[row, col],

@@ -7,6 +7,11 @@ import HumSpectra.utilits as ut
 
 import os
 
+plt.rcParams['axes.titlesize'] = 24
+plt.rcParams['ytick.labelsize'] = 20
+plt.rcParams['xtick.labelsize'] = 24
+plt.rcParams['axes.labelsize'] = 20
+
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 current_dir = Path(__file__).parent.parent

@@ -21,16 +21,16 @@ parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
 
 for i, folder in enumerate(date_folder_list):
     
-    fluo_path = Path.joinpath(folder, "Fluorescence")
-    uv_path = Path.joinpath(folder, "UV","Individual_spectra")
+    fluo_path = Path(r"D:\lab\KNP-analysis\Initial_data\Fluorescence")
+    print(fluo_path)
     
-    carbon_data = pd.read_excel(Path.joinpath(folder, 'C_org.xlsx'))
-    carbon_data.Sample = carbon_data.Sample.apply(lambda x: x+f'-{date_list[i]}')
+    uv_path = Path.joinpath(Path.joinpath(INIT_DATA_2025).parent, "UV","absorption")    
+    carbon_data = pd.read_csv(r"D:\lab\KNP-analysis\Initial_data\Additional_data\C_org.csv")
     
-    geodata = pd.read_excel(Path.joinpath(folder, 'GeoData.xlsx'))
-    geodata.Sample = geodata.Sample.apply(lambda x: x+f'-{date_list[i]}')
+    geodata = pd.read_csv(r"D:\lab\KNP-analysis\Initial_data\Additional_data\GeoData.csv")
     
     fluo_spectra_list = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
+    print(len(fluo_spectra_list))
     
     uv_abs_spectra_list = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="absorption")
     uv_reflect_spectra_list = ut.load_spectra_data(uv_path, uv.read_csv_uv, spectra_type="reflection")
@@ -186,9 +186,9 @@ for i, folder in enumerate(date_folder_list):
             
             sample = collection.samples[sample_name]
             sample.pH = row["pH"]
-            sample.Eh = row['eH']
+            sample.Eh = row['Eh']
             sample.latitude = row['latitude']
-            sample.lontitude = row['lontitude']
+            sample.lontitude = row['longitude']
             
         #sample.add_tag("geo")
     
@@ -221,3 +221,5 @@ for k,row in parafac_data.iterrows():
     
 print(f"Всего образцов в коллекции: {len(collection.samples)}")
 collection.save_collection("KNP_samples.pkl")
+data = collection.create_flexible_descriptors_table(0.5)
+data.to_csv(r"D:\lab\KNP-analysis\Received_data\Statistics\all_descriptors.csv")

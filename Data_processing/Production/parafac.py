@@ -9,6 +9,11 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
+plt.rcParams['axes.titlesize'] = 24
+plt.rcParams['ytick.labelsize'] = 20
+plt.rcParams['xtick.labelsize'] = 24
+plt.rcParams['axes.labelsize'] = 20
+
 from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
@@ -29,7 +34,7 @@ for name, sample in collection.samples.items():
         filter_collection.append(sample)
 
 loader = EEMDataLoader()
-eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection)
+eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection, filter_tags=None)
 data_info = loader.get_data_info()
 
 analyzer = ComponentVisualizer(n_components=3)
