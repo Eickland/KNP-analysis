@@ -18,7 +18,7 @@ from sklearn.svm import OneClassSVM
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 plt.rcParams['axes.titlesize'] = 24
-
+plt.style.use({'axes.grid': False})
 plt.rcParams['xtick.labelsize'] = 24
 plt.rcParams['axes.labelsize'] = 20
 
@@ -324,19 +324,18 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     # ==========================================
     # 4. КРАСИВАЯ ВИЗУАЛИЗАЦИЯ
     # ==========================================
-    sns.set_theme(style="whitegrid")
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-    fig.suptitle(f'Анализ чувствительности: Влияние роста {feature_to_shift} на распознавание Байкала', fontsize=16)
+    fig.suptitle(f'Анализ чувствительности: Влияние роста РОУ на распознавание вод Байкала', fontsize=16)
 
     # График 1: Падение Recall (Способность видеть разницу)
     ax1.plot(df_res['Real_Carbon_Value'], df_res['IF_Recall'], label='Isolation Forest', color='#2ca02c', linewidth=2.5)
     #ax1.plot(df_res['Real_Carbon_Value'], df_res['SVM_Recall'], label='One-Class SVM', color='#1f77b4', linewidth=2.5)
     
     ax1.axhline(0.5, color='red', linestyle='--', alpha=0.7, label='Случайное угадывание (0.5)')
-    ax1.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
+    #ax1.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
-    ax1.set_title('Деградация чувствительности (Recall)', fontsize=20)
-    ax1.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=20)
+    #ax1.set_title('Деградация чувствительности (Recall)', fontsize=20)
+    ax1.set_xlabel(f'Абсолютное значение РОУ в Байкале', fontsize=20)
     ax1.set_ylabel('Доля распознанных аномалий (Recall)', fontsize=20)
     ax1.set_ylim(-0.05, 1.05)
     ax1.legend(loc='lower left')
@@ -346,11 +345,11 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     #ax2.plot(df_res['Real_Carbon_Value'], df_res['SVM_Distance'], label='One-Class SVM Dist.', color='#1f77b4', linestyle='-.', linewidth=2)
     
     ax2.axhline(0, color='black', linestyle='-', alpha=0.8, label='Граница нормы (0.0)')
-    ax2.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
+    #ax2.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
     ax2.set_title('Приближение к эталонной сигнатуре', fontsize=16)
-    ax2.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=20)
-    ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=14)
+    ax2.set_xlabel(f'Абсолютное значение РОУ в Байкале, мг/л', fontsize=20)
+    ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=20)
     ax2.legend(loc='upper left')
 
     plt.tight_layout()
