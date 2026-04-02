@@ -330,7 +330,7 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
 
     # График 1: Падение Recall (Способность видеть разницу)
     ax1.plot(df_res['Real_Carbon_Value'], df_res['IF_Recall'], label='Isolation Forest', color='#2ca02c', linewidth=2.5)
-    ax1.plot(df_res['Real_Carbon_Value'], df_res['SVM_Recall'], label='One-Class SVM', color='#1f77b4', linewidth=2.5)
+    #ax1.plot(df_res['Real_Carbon_Value'], df_res['SVM_Recall'], label='One-Class SVM', color='#1f77b4', linewidth=2.5)
     
     ax1.axhline(0.5, color='red', linestyle='--', alpha=0.7, label='Случайное угадывание (0.5)')
     ax1.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
@@ -343,14 +343,14 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
 
     # График 2: Приближение к границе нормы (Decision Function)
     ax2.plot(df_res['Real_Carbon_Value'], df_res['IF_Distance'], label='Isolation Forest Dist.', color='#2ca02c', linestyle='-.', linewidth=2)
-    ax2.plot(df_res['Real_Carbon_Value'], df_res['SVM_Distance'], label='One-Class SVM Dist.', color='#1f77b4', linestyle='-.', linewidth=2)
+    #ax2.plot(df_res['Real_Carbon_Value'], df_res['SVM_Distance'], label='One-Class SVM Dist.', color='#1f77b4', linestyle='-.', linewidth=2)
     
     ax2.axhline(0, color='black', linestyle='-', alpha=0.8, label='Граница нормы (0.0)')
     ax2.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
     ax2.set_title('Приближение к эталонной сигнатуре', fontsize=16)
     ax2.set_xlabel(f'Абсолютное значение {feature_to_shift} в Байкале', fontsize=20)
-    ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=20)
+    ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=14)
     ax2.legend(loc='upper left')
 
     plt.tight_layout()

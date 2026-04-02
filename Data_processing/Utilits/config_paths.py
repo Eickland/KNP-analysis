@@ -6,6 +6,8 @@ INIT_DATA = PROJECT_ROOT / 'Initial_data'
 
 INIT_DATA_2024 = PROJECT_ROOT / 'Initial_data' / '2024'
 INIT_DATA_2025 = PROJECT_ROOT / 'Initial_data' / '2025'
+INIT_DATA = PROJECT_ROOT / 'Initial_data'
+
 
 RECEIVED_DATA = PROJECT_ROOT / 'Server' / 'Received_data'
 
