@@ -198,26 +198,26 @@ def create_satellite_map_simple(df, lat_col='latitude', lon_col='longitude',
         ax=ax,
         color='red',
         marker='o',
-        markersize=100,
+        markersize=12,
         edgecolor='white',
         linewidth=2,
         zorder=5,
         label='Точки отбора'
     )
-    
+    """
     # Добавляем подписи
     for idx, row in gdf.iterrows():
         ax.annotate(
             f"{idx+1}",
             xy=(row.geometry.x, row.geometry.y),
-            xytext=(8, 8),
+            xytext=(3, 3),
             textcoords='offset points',
-            fontsize=10,
+            fontsize=6,
             color='white',
             weight='bold',
             bbox=dict(boxstyle='round,pad=0.3', facecolor='red', alpha=0.8)
         )
-    
+    """
     # Выбираем источник подложки
     if use_satellite:
         source = ctx.providers.Esri.WorldImagery  # Спутник
@@ -264,8 +264,12 @@ def create_satellite_map_simple(df, lat_col='latitude', lon_col='longitude',
 if __name__ == "__main__":
     # Создаем пример данных
     df = pd.read_excel(r"D:\lab\KNP-analysis\Initial_data\Additional_data\GeoData.xlsx")
-    df['Class'] = df.Sample.apply(lambda x: ut.extract_class_from_name(x))
-    df = df[df['Class'] == 'Baikal']
+    df['Class'] = df.Sample.apply(lambda x: ut.extract_subclass_from_name(x))
+    df = df[df['Class'] != "Storage 8"]
+    df = df[df['Class'] != "Storage 9"]
+    df = df[df['Class'] != "Storage 10"]
+    
+    #df = df[df['Class'] == 'Baikal']
     df = df[df['latitude'] < 51.6]
     df = df[df['latitude'] != 51.496572]
     df.reset_index(inplace=True)
