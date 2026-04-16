@@ -9,30 +9,16 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-plt.rcParams['axes.titlesize'] = 24
-plt.rcParams['ytick.labelsize'] = 20
-plt.rcParams['xtick.labelsize'] = 24
-plt.rcParams['axes.labelsize'] = 20
+plt.rcParams['axes.titlesize'] = 12
+plt.rcParams['ytick.labelsize'] = 10
+plt.rcParams['xtick.labelsize'] = 10
+plt.rcParams['axes.labelsize'] = 10
 
 from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
-
-data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.5)
-data.dropna(inplace=True)
-
-MainData = ut.filter_by_iqr_per_group(data,iqr_param=1.5,target_column='Subclass', filter_columns=["Asm_280",'Asm_350','HIX','FIX'])
-white_names_list = list(MainData['Sample'].values)
-
-filter_collection = []
-
-for name, sample in collection.samples.items():
-    
-    if sample.sample_class == 'ADOM':
-        
-        filter_collection.append(sample)
-
+print(collection.samples['ADOM-SLB-B2_K3_100-2025'])
 loader = EEMDataLoader()
 eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection, filter_tags=None)
 data_info = loader.get_data_info()
@@ -44,7 +30,7 @@ factors = analyzer.fit_parafac(
     emission_wavelengths=em_waves,
     sample_names=sp_names)
 
-analyzer.plot_component_loadings(normalization='percentage')
+analyzer.plot_component_loadings(normalization='percentage',group_type='Subclass')
 plt.tight_layout()
 plt.savefig(Path.joinpath(PARAFAC_PATH,"graphs","component_loadings.png"))
 

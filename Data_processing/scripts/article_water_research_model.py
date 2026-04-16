@@ -19,7 +19,8 @@ project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 plt.rcParams['axes.titlesize'] = 24
 plt.style.use({'axes.grid': False})
-plt.rcParams['xtick.labelsize'] = 24
+plt.rcParams['xtick.labelsize'] = 22
+plt.rcParams['ytick.labelsize'] = 22
 plt.rcParams['axes.labelsize'] = 20
 
 from HumSpectra.sample import SampleCollection
@@ -96,11 +97,16 @@ collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
 print(f'Коллекция загружена, к-во образцов: {len(collection.samples)}')
 
-data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.25)
+data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.75)
 data.dropna(inplace=True)
 print(data.columns)
 MainData = ut.filter_by_iqr_per_group(data,iqr_param=2,target_column='Subclass', filter_columns=["asm_350",'org_carbon'])
 MainData = MainData[MainData['Subclass'] != 'Storage 8']
+#MainData = MainData[MainData['Class'] == 'ADOM']
+MainData['name'] = MainData.index
+MainData['year'] = MainData['name'].apply(lambda x: x[-4:])
+MainData = MainData[MainData['year'] == '2025']
+print(len(MainData))
 #MainData.set_index(["Class","Subclass","Sample"],inplace=True)
 
 MultiSearchOn = False
@@ -269,7 +275,7 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     # 1. Подготовка данных
     sludge_all = MainData[MainData['Class'] == 'ADOM']
     baikal_all = MainData[MainData['Class'] == 'Baikal']
-    
+    print(len(baikal_all))
     # Масштабирование
     scaler = StandardScaler()
     X_train_sludge = scaler.fit_transform(sludge_all[features])
@@ -325,7 +331,7 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     # 4. КРАСИВАЯ ВИЗУАЛИЗАЦИЯ
     # ==========================================
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-    fig.suptitle(f'Анализ чувствительности: Влияние роста РОУ на распознавание вод Байкала', fontsize=16)
+    #fig.suptitle(f'Анализ чувствительности: Влияние роста РОУ на распознавание вод Байкала', fontsize=16)
 
     # График 1: Падение Recall (Способность видеть разницу)
     ax1.plot(df_res['Real_Carbon_Value'], df_res['IF_Recall'], label='Isolation Forest', color='#2ca02c', linewidth=2.5)
@@ -335,7 +341,7 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     #ax1.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
     #ax1.set_title('Деградация чувствительности (Recall)', fontsize=20)
-    ax1.set_xlabel(f'Абсолютное значение РОУ в Байкале', fontsize=20)
+    ax1.set_xlabel(f'Среднее значение РОУ в Байкале, мг/л', fontsize=20)
     ax1.set_ylabel('Доля распознанных аномалий (Recall)', fontsize=20)
     ax1.set_ylim(-0.05, 1.05)
     ax1.legend(loc='lower left')
@@ -348,7 +354,7 @@ def analyze_carbon_sensitivity(MainData, features, feature_to_shift='org_carbon'
     #ax2.axvline(mean_sludge, color='grey', linestyle=':', label='Среднее значение шлама')
     
     ax2.set_title('Приближение к эталонной сигнатуре', fontsize=16)
-    ax2.set_xlabel(f'Абсолютное значение РОУ в Байкале, мг/л', fontsize=20)
+    ax2.set_xlabel(f'Среднее значение РОУ в Байкале, мг/л', fontsize=20)
     ax2.set_ylabel('Оценка "нормальности" (<0 = аномалия, >0 = шлам)', fontsize=20)
     ax2.legend(loc='upper left')
 

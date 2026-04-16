@@ -265,6 +265,7 @@ if __name__ == "__main__":
     # Создаем пример данных
     df = pd.read_excel(r"D:\lab\KNP-analysis\Initial_data\Additional_data\GeoData.xlsx")
     df['Class'] = df.Sample.apply(lambda x: ut.extract_subclass_from_name(x))
+    df = df[df['Class'] != "Storage 1"]
     df = df[df['Class'] != "Storage 8"]
     df = df[df['Class'] != "Storage 9"]
     df = df[df['Class'] != "Storage 10"]
