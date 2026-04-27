@@ -16,6 +16,25 @@ feature_names_translate_dict = {
     'org_carbon' : 'Орг. углерод, мг/л'
 }
 
+def box_plot_default(MainData, path,target_column='Class',dpi=150, save=False):
+    
+    numeric_cols = MainData.select_dtypes(include=['float']).columns
+    
+    for feature in numeric_cols:
+        
+        fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=dpi)
+        box = sns.boxplot(data = MainData.reset_index(),
+                            hue=target_column, y=feature, ax=axes)
+        ut.add_median_labels(box)
+        plt.legend(loc='upper right', bbox_to_anchor = (1, 0.5, 0.3, 0.5))
+        if feature == 'org_carbon':
+            plt.xlabel(feature_names_translate_dict['org_carbon'])
+            plt.title(f'Распределение {feature_names_translate_dict['org_carbon']}')
+        plt.tight_layout()        
+        if save:
+            plt.savefig(path + fr'\{feature}.png')
+            plt.close()
+
 def hist_plot_default(MainData, path, target_column, save=False):
     
     numeric_cols = MainData.select_dtypes(include=['float']).columns
@@ -41,9 +60,30 @@ def swarm_plot_default(MainData, path, target_column, save=False):
     for feature in numeric_cols:
         
         fig, axes = plt.subplots(1,1,figsize=(8,8))
-        sns.swarmplot(data = MainData, hue=target_column, y=feature, ax=axes,
+        sns.swarmplot(data = MainData, x=target_column, y=feature,hue=target_column,legend=False, ax=axes,
                         palette="rainbow",edgecolor=".3",linewidth=.5,log_scale=False,)
+        plt.xticks(rotation=45)
+        if feature == 'org_carbon':
+            plt.ylabel(feature_names_translate_dict['org_carbon'])
+            plt.title(f'Распределение {feature_names_translate_dict['org_carbon']}')
+            
+        if save:
+            plt.savefig(path + fr'\{feature}.png')
+            plt.close()
+            
+def strip_plot_default(MainData, path, target_column, save=False):
+    
+    numeric_cols = MainData.select_dtypes(include=['float']).columns
+    
+    for feature in numeric_cols:
         
+        fig, axes = plt.subplots(1,1,figsize=(8,8))
+        sns.stripplot(data=MainData, x=target_column, y=feature, hue=target_column,
+                    legend=False, ax=axes, palette="rainbow",
+                    edgecolor=".3", linewidth=.5, 
+                    jitter=0.3,  # Добавляет случайный шум по горизонтали
+                    size=4)
+        plt.xticks(rotation=45)
         if feature == 'org_carbon':
             plt.ylabel(feature_names_translate_dict['org_carbon'])
             plt.title(f'Распределение {feature_names_translate_dict['org_carbon']}')
@@ -51,9 +91,7 @@ def swarm_plot_default(MainData, path, target_column, save=False):
         if save:
             plt.savefig(path + fr'\{feature}.png')
             plt.close()            
-            
-                   
-    
+                
 def scatter_plot_default(MainData, path, target_column, save=False, label_class=None):
     
     numeric_cols = MainData.select_dtypes(include=['float']).columns

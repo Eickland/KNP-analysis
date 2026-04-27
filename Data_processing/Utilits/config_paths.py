@@ -15,7 +15,8 @@ CLASSIFICATION_PATH = PROJECT_ROOT / 'Server' / 'Received_data' /'Model'/ 'Class
 CLUSTERING_PATH = PROJECT_ROOT / 'Server' / 'Received_data'/'Model' / 'Clustering'
 
 PARAFAC_PATH = PROJECT_ROOT  / 'Received_data' / 'Parafac'
-STAT_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Statistics'
+STAT_PATH = PROJECT_ROOT / 'Received_data' / 'Statistics'
+GRAPH_PATH = PROJECT_ROOT / 'Received_data' / 'Statistics' / 'Correlations' / 'Graphs'
 SPECTRA_PATH = PROJECT_ROOT / 'Server' / 'Received_data' / 'Spectra'
 
 CACHE_DATA_PATH = PROJECT_ROOT / 'Initial_data' / '_data_cache'

@@ -10,7 +10,7 @@ import pandas as pd
 
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
-from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, PARAFAC_PATH
+from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, PARAFAC_PATH, STAT_PATH
 
 date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
@@ -21,13 +21,13 @@ parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
 
 for i, folder in enumerate(date_folder_list):
     
-    fluo_path = Path(r"D:\lab\KNP-analysis\Initial_data\Fluorescence")
+    fluo_path = Path(Path.joinpath((INIT_DATA_2025).parent,"Fluorescence"))
     print(fluo_path)
     
     uv_path = Path.joinpath(Path.joinpath(INIT_DATA_2025).parent, "UV","absorption")    
-    carbon_data = pd.read_csv(r"D:\lab\KNP-analysis\Initial_data\Additional_data\C_org.csv")
+    carbon_data = pd.read_csv(Path.joinpath((INIT_DATA_2025).parent, "Additional_data","C_org.csv"))
     
-    geodata = pd.read_csv(r"D:\lab\KNP-analysis\Initial_data\Additional_data\GeoData.csv")
+    geodata = pd.read_csv(Path.joinpath((INIT_DATA_2025).parent, "Additional_data","GeoData.csv"))
     
     fluo_spectra_list = ut.load_spectra_data(fluo_path, fl.read_fluo_3d)
     print(len(fluo_spectra_list))
@@ -221,5 +221,7 @@ for k,row in parafac_data.iterrows():
     
 print(f"Всего образцов в коллекции: {len(collection.samples)}")
 collection.save_collection("KNP_samples.pkl")
-data = collection.create_flexible_descriptors_table(0.5)
-data.to_csv(r"D:\lab\KNP-analysis\Received_data\Statistics\all_descriptors.csv")
+
+data = collection.create_flexible_descriptors_table(0.25,sample_attributes=['org_carbon','pH','Eh'])
+data.to_csv(Path.joinpath(STAT_PATH,"all_descriptors.csv"))
+

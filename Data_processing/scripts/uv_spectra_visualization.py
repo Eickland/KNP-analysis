@@ -51,7 +51,9 @@ for sample_name in sample_list.keys():
         if name == 'ADOM-SLB-B-1-2025':
             short_name = 'ADOM-B'
         print(sample_name)
-        uv_df = sample_list[sample_name].uv_vis_absorption    
+        uv_df = sample_list[sample_name].uv_vis_absorption
+        if uv_df is None:
+            raise ValueError()    
         uv_df.attrs['name'] = short_name
         uv_df.attrs['TOC'] = sample_list[sample_name].org_carbon
         uv.plot_uv(uv_df,ax=ax,norm_by_TOC=True)
@@ -79,7 +81,10 @@ for sample_name in sample_list.keys():
             short_name = 'ADOM-B'
         
         fluo = sample_list[sample_name].fluorescence_eem
-     # type: ignore
+        
+        if fluo is None:
+            raise ValueError()
+
         fluo.attrs['name'] = short_name
         
         fl.plot_2d(fluo,ex_wave=280,ax=ax,norm=True,raman_spline=True)
