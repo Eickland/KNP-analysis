@@ -10,12 +10,12 @@ import pandas as pd
 
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
-from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, PARAFAC_PATH, STAT_PATH
+from Data_processing.Utilits.config_paths import INIT_DATA_2024, INIT_DATA_2025, PARAFAC_PATH,CACHE_DATA_PATH,STAT_PATH
 
 date_list = ["2024","2025"]
 date_folder_list = [INIT_DATA_2024,INIT_DATA_2025]
 
-collection = SampleCollection(cache_dir=Path.joinpath(Path.cwd(),"Initial_data","data_cache"))
+collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 
 parafac_data = pd.read_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"))
 
