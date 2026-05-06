@@ -103,16 +103,16 @@ for i, folder in enumerate(date_folder_list):
         sample.uv_vis_absorption_smooth = smooth_uv_abs
         #sample.add_tag("smooth_uv_abs")   
         
-        sample.descriptors['B1'] = uv.calc_cdom_descriptors(uv_abs_recall)['B1_prime']
-        sample.descriptors['B2'] = uv.calc_cdom_descriptors(uv_abs_recall)['B2_prime']
-        sample.descriptors['Ag_275'] = uv.calc_cdom_descriptors(uv_abs_recall)['ag_275']
-        sample.descriptors['Ag_380'] = uv.calc_cdom_descriptors(uv_abs_recall)['ag_380']
-        sample.descriptors['S_380_443'] = uv.calc_cdom_descriptors(uv_abs_recall)['S_380_443']
-        sample.descriptors['B1'] = uv.calc_cdom_descriptors(uv_abs_recall)['B1_prime']                  
-        sample.descriptors['E2E3'] = uv.calc_e2_e3(uv_abs_recall)
-        sample.descriptors['E3E4'] = uv.calc_e3_e4(uv_abs_recall)
-        sample.descriptors['E4E6'] = uv.calc_e4_e6(uv_abs_recall)                              
-        sample.descriptors['lambda'] = uv.calc_lambda_UV(uv_abs_recall)
+        sample.descriptors['B1'] = uv.calc_cdom_descriptors(smooth_uv_abs)['B1_prime']
+        sample.descriptors['B2'] = uv.calc_cdom_descriptors(smooth_uv_abs)['B2_prime']
+        sample.descriptors['Ag_275'] = uv.calc_cdom_descriptors(smooth_uv_abs)['ag_275']
+        sample.descriptors['Ag_380'] = uv.calc_cdom_descriptors(smooth_uv_abs)['ag_380']
+        sample.descriptors['S_380_443'] = uv.calc_cdom_descriptors(smooth_uv_abs)['S_380_443']
+        sample.descriptors['B1'] = uv.calc_cdom_descriptors(smooth_uv_abs)['B1_prime']                  
+        sample.descriptors['E2E3'] = uv.calc_e2_e3(smooth_uv_abs)
+        sample.descriptors['E3E4'] = uv.calc_e3_e4(smooth_uv_abs)
+        sample.descriptors['E4E6'] = uv.calc_e4_e6(smooth_uv_abs)                              
+        sample.descriptors['lambda'] = uv.calc_lambda_UV(smooth_uv_abs)
                     
     for uv_refl in uv_reflect_spectra_list:
         
@@ -224,4 +224,5 @@ collection.save_collection("KNP_samples.pkl")
 
 data = collection.create_flexible_descriptors_table(0.25,sample_attributes=['org_carbon','pH','Eh'])
 data.to_csv(Path.joinpath(STAT_PATH,"all_descriptors.csv"))
+data.to_excel(Path.joinpath(STAT_PATH,"all_descriptors.xlsx"))
 

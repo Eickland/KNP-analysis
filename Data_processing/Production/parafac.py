@@ -9,16 +9,15 @@ import HumSpectra.utilits as ut
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
-plt.rcParams['axes.titlesize'] = 12
-plt.rcParams['ytick.labelsize'] = 10
-plt.rcParams['xtick.labelsize'] = 10
-plt.rcParams['axes.labelsize'] = 10
+plt.rcParams['axes.titlesize'] = 20
+plt.rcParams['ytick.labelsize'] = 20
+plt.rcParams['xtick.labelsize'] = 20
+plt.rcParams['axes.labelsize'] = 20
 
 from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
-print(collection.samples['ADOM-SLB-B2_K3_100-2025'])
 loader = EEMDataLoader()
 eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection, filter_tags=None)
 data_info = loader.get_data_info()
