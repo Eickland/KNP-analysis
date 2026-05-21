@@ -194,11 +194,7 @@ for i, folder in enumerate(date_folder_list):
     
     for name, sample in collection.samples.items():
         
-        if sample.has_tag('2024'):
-            continue
-        
-        else:
-            sample.add_tag(date_list[i])
+        sample.add_tag(name[-4:])
             
 for k,row in parafac_data.iterrows():
     

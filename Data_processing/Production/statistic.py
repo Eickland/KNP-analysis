@@ -25,14 +25,15 @@ plt.rcParams["legend.fontsize"] = 12
 def box_plot_default(MainData, path,target_column='Class',dpi=150, save=False):
     
     numeric_cols = MainData.select_dtypes(include=['float']).columns
-    
+    MainData = MainData.replace('Storage', 'Карта', regex=True)
+    MainData = MainData.replace('Baikal', 'Байкал', regex=False)
     for feature in numeric_cols:
         
         fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=dpi)
         box = sns.boxplot(data = MainData.reset_index(),
                             hue=target_column, y=feature, ax=axes)
         ut.add_median_labels(box,fontsize=13)
-        plt.legend(loc='upper right', bbox_to_anchor = (1, 0.5, 0.3, 0.5),fontsize=16)
+        plt.legend(loc='center left', bbox_to_anchor=(1.02, 0.5), fontsize=16)
         plt.ylabel(feature,fontsize=19)
         plt.yticks(fontsize=19)
         if feature == 'org_carbon':

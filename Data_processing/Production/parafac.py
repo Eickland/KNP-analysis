@@ -18,8 +18,9 @@ from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
+print(len(collection.samples))
 loader = EEMDataLoader()
-eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection, filter_tags=None)
+eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection,filter_tags=['2025'])
 data_info = loader.get_data_info()
 
 analyzer = ComponentVisualizer(n_components=3)
@@ -29,7 +30,8 @@ factors = analyzer.fit_parafac(
     emission_wavelengths=em_waves,
     sample_names=sp_names)
 
-analyzer.plot_component_loadings(normalization='percentage',group_type='Subclass')
+analyzer.plot_component_loadings(normalization='max',group_type='Subclass')
+plt.ylabel('Сумма значений компонентов')
 plt.tight_layout()
 plt.savefig(Path.joinpath(PARAFAC_PATH,"graphs","component_loadings.png"))
 
@@ -45,4 +47,4 @@ analyzer.plot_all_components_eem(figsize=(5,14))
 plt.tight_layout()
 plt.savefig(Path.joinpath(PARAFAC_PATH,"graphs","plot_all_components_eem.png"))
 
-analyzer.export_loadings_to_csv(Path.joinpath(PARAFAC_PATH,"data","parafac.csv"),normalization='max')
+analyzer.export_loadings_to_excel(Path.joinpath(PARAFAC_PATH,"data","parafac.xlsx"),normalization='max')
