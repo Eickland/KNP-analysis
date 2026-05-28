@@ -504,6 +504,10 @@ for name,sample in sample_list.items():
         
         uv_df.attrs['class'] = sample.sample_class
         uv_df.attrs['subclass'] = sample.sample_subclass
+        
+        if uv_df.attrs['subclass'] == 'Storage 8':
+            continue
+        
         uv_df.attrs['TOC'] = sample.org_carbon
         
         uv_df = uv_df.loc[260:]

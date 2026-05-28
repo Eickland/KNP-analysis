@@ -18,6 +18,21 @@ from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
+
+sample_list = []
+
+for name, sample in collection.samples.items():
+    
+    if sample.sample_subclass == 'Mix':
+        continue
+    
+    if sample.sample_subclass == 'Storage 8':
+        continue    
+    sample_list.append(sample)
+    
+collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
+collection = collection.from_samples(sample_list)
+
 print(len(collection.samples))
 loader = EEMDataLoader()
 eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection,filter_tags=['2025'])
@@ -30,7 +45,7 @@ factors = analyzer.fit_parafac(
     emission_wavelengths=em_waves,
     sample_names=sp_names)
 
-analyzer.plot_component_loadings(normalization='max',group_type='Subclass')
+analyzer.plot_component_loadings(normalization='sum',group_type='Subclass')
 plt.ylabel('Сумма значений компонентов')
 plt.tight_layout()
 plt.savefig(Path.joinpath(PARAFAC_PATH,"graphs","component_loadings.png"))
