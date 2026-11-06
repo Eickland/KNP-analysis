@@ -5,7 +5,7 @@ import numpy as np
 from HumSpectra.parafac import EEMDataLoader, ComponentVisualizer
 from HumSpectra.sample import SampleCollection, split_by_category
 import HumSpectra.utilits as ut
-
+import pandas as pd
 project_root = Path.cwd()
 sys.path.insert(0, str(project_root))
 
@@ -18,10 +18,20 @@ from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, PARAFAC_PATH
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
-
+print(len(collection.samples))
 sample_list = []
 
+data = pd.read_excel(r"D:\lab\KNP-analysis\Received_data\Statistics\2024\Documents\Исходные данные за 2024 год.xlsx")
+
 for name, sample in collection.samples.items():
+    if '2025' in sample.sample_id and sample.sample_subclass != 'Baikal':
+        continue
+    
+    if sample.sample_id not in data['Sample'].to_list() and sample.sample_subclass != 'Baikal':
+        continue
+    
+    if sample.sample_id == 'ADOM-SLB-B1-4-2025':
+        continue
     
     if sample.sample_subclass == 'Mix':
         continue
@@ -32,10 +42,12 @@ for name, sample in collection.samples.items():
     
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection = collection.from_samples(sample_list)
-
+data = collection.create_flexible_descriptors_table(0.25,sample_attributes=['org_carbon','pH','Eh'])
+data.to_csv("2024.csv")
+data.to_excel("2024.xlsx")
 print(len(collection.samples))
 loader = EEMDataLoader()
-eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection,filter_tags=['2025'])
+eem_tensor,em_waves,ex_waves,sp_names,_ = loader.load_eem_from_samples(collection,filter_tags=None)
 data_info = loader.get_data_info()
 
 analyzer = ComponentVisualizer(n_components=3)

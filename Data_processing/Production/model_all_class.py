@@ -32,12 +32,12 @@ print(f'Коллекция загружена, к-во образцов: {len(co
 
 data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon', 'sample_subclass', 'sample_class'], min_coverage=0.5)
 data.dropna(inplace=True)
-data = pd.read_excel(r"C:\Users\Kirill\Desktop\Lab\KNP-analysis\Received_data\Statistics\2024\Documents\Исходные данные за 2024 год.xlsx")
+data = pd.read_excel(r"D:\lab\KNP-analysis\Received_data\Statistics\2024\Documents\Исходные данные за 2024 год.xlsx")
 data = data[data['Class'] != 'Tech']
 data = data[data['Class'] != 'Osinovka']
 # Создаем маски для разных условий
 #mask_adom = (MainData['sample_class'] == 'ADOM')
-MainData = ata
+MainData = data
 MainData.set_index(["Class", "Subclass", "Sample"], inplace=True)
 
 

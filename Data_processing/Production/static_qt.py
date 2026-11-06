@@ -12,10 +12,10 @@ import HumSpectra.ultraviolet as uv
 import HumSpectra.utilits as ut
 from HumSpectra.sample import SampleCollection
 
-data = pd.read_excel(r"C:\Users\Kirill\Desktop\Lab\KNP-analysis\Received_data\Statistics\2024\Documents\Исходные данные за 2024 год.xlsx")
+data = pd.read_excel(r"D:\lab\KNP-analysis\Received_data\Statistics\2024\Documents\Исходные данные за 2024 год.xlsx")
 
 
-ph_data = pd.read_csv(r'C:\Users\Kirill\Desktop\Lab\KNP-analysis\Initial_data\Additional_data\GeoData.csv')
+ph_data = pd.read_csv(r'D:\lab\KNP-analysis\Initial_data\Additional_data\GeoData.csv')
 
 main = data.merge(ph_data, on='Sample')
 main.drop(columns=['latitude', 'longitude'], inplace=True)
@@ -26,7 +26,7 @@ main=data
 # КВАРТИЛИ ПО КЛАССАМ И ПОДКЛАССАМ
 # ============================================================================
 
-OUTPUT_PATH = Path(r"C:\Users\Kirill\Desktop\Lab\KNP-analysis\Received_data\Statistics\2024\Documents\Квартили за 2024 год.xlsx")
+OUTPUT_PATH = Path(r"D:\lab\KNP-analysis\Received_data\Statistics\2024\Documents\Квартили за 2024 год.xlsx")
 DECIMALS = 3          # знаков после запятой в таблицах
 ADD_TOTAL_ROW = True  # добавить строку "Все образцы" (по всему набору без деления на группы)
 
