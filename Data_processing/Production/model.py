@@ -18,8 +18,8 @@ sys.path.insert(0, str(project_root))
 from HumSpectra.sample import SampleCollection
 from Data_processing.Utilits.config_paths import CACHE_DATA_PATH, CLASSIFICATION_PATH
 
-GrindBestCombEnabled = False
-SingleModelEnabled = True
+GrindBestCombEnabled = True
+SingleModelEnabled = False
 
 collection = SampleCollection(cache_dir=CACHE_DATA_PATH)
 collection.load_collection(str(Path.joinpath(CACHE_DATA_PATH,"KNP_samples.pkl")))
@@ -29,13 +29,16 @@ data = collection.create_flexible_descriptors_table(sample_attributes=['org_carb
 data.dropna(inplace=True)
 
 MainData = ut.filter_by_iqr_per_group(data,iqr_param=2.5,target_column='Subclass', filter_columns=["asm_350",'Suva'])
-
+print(MainData)
 # Создаем маски для разных условий
-mask_adom_2025 = (MainData['sample_class'] == 'ADOM') & (MainData['Sample'].str[-4:] == '2025')
+mask_adom = (MainData['sample_class'] == 'ADOM')
+
+
 
 # Отделяем строки с Baikal для случайного разделения
 baikal_df = MainData[MainData['sample_class'] == 'Baikal'].copy()
 
+baikal_df = baikal_df[baikal_df.index !='ADOM-SLB-B2-3-2025']
 # Случайно делим Baikal строки на две части
 np.random.seed(42)  # для воспроизводимости
 baikal_indices = baikal_df.index.tolist()
@@ -46,7 +49,7 @@ half_baikal_count = len(baikal_indices) // 2
 baikal_part1_indices = baikal_indices[:half_baikal_count]
 
 # Создаем финальную маску для первой части
-mask_part1 = mask_adom_2025 | MainData.index.isin(baikal_part1_indices)
+mask_part1 = MainData.index.isin(baikal_part1_indices)
 
 # Разделяем DataFrame
 test_data = MainData[mask_part1].copy()
@@ -74,7 +77,7 @@ if GrindBestCombEnabled:
     count_feature_list = []
 
     num_fearure_list = [1,2,3]
-    target = 1
+    target = 0
     
     
     num_iterations = 0
@@ -125,7 +128,7 @@ if GrindBestCombEnabled:
     accuracy_data['feature'] = combinations_2Dlist
     accuracy_data['num_feature'] = count_feature_list
 
-    main_model_output_save_path = Path.joinpath(Path.cwd(),"Server","Received_data","Model",f"Model_accuracy_ADOM_subclass_2025_cross_val.xlsx")
+    main_model_output_save_path = Path.joinpath(Path.cwd(),"Received_data","Model",f"Model_accuracy_ADOM_subclass_2025_cross_val.xlsx")
     
     accuracy_data.sort_values('LDA_weight_accuracy',ascending=False).to_excel(main_model_output_save_path)
 

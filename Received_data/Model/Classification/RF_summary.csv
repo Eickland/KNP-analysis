@@ -1,0 +1,28 @@
+﻿Признаки;Класс образцов;К-во образцов;Размер тестовой выборки;Точность (precision);Полнота (recall);F1-мера;Accuracy модели
+Asm_280, Component_2;ADOM;76;16;0.8889;1.0;0.9412;0.8649
+Asm_280, Component_2;Baikal;12;2;1.0;1.0;1.0;0.8649
+Asm_280, Component_2;Coal;4;1;0.0;0.0;0.0;0.8649
+Asm_280, Component_2;Lg;58;12;1.0;1.0;1.0;0.8649
+Asm_280, Component_2;Lst;7;1;1.0;1.0;1.0;0.8649
+Asm_280, Component_2;Peat;13;3;0.0;0.0;0.0;0.8649
+Asm_280, Component_2;Soil;11;2;0.3333;0.5;0.4;0.8649
+Asm_280, Component_2;Среднее (macro avg);181;37;0.6032;0.6429;0.6202;0.8649
+Asm_280, Component_2;Среднее (weighted avg);181;37;0.8078;0.8649;0.834;0.8649
+Asm_280, Component_2, FIX;ADOM;76;16;1.0;1.0;1.0;0.973
+Asm_280, Component_2, FIX;Baikal;12;2;1.0;1.0;1.0;0.973
+Asm_280, Component_2, FIX;Coal;4;1;0.0;0.0;0.0;0.973
+Asm_280, Component_2, FIX;Lg;58;12;1.0;1.0;1.0;0.973
+Asm_280, Component_2, FIX;Lst;7;1;1.0;1.0;1.0;0.973
+Asm_280, Component_2, FIX;Peat;13;3;1.0;1.0;1.0;0.973
+Asm_280, Component_2, FIX;Soil;11;2;0.6667;1.0;0.8;0.973
+Asm_280, Component_2, FIX;Среднее (macro avg);181;37;0.8095;0.8571;0.8286;0.973
+Asm_280, Component_2, FIX;Среднее (weighted avg);181;37;0.955;0.973;0.9622;0.973
+Asm_280, Suva, FIX, C_org;ADOM;76;16;1.0;1.0;1.0;0.973
+Asm_280, Suva, FIX, C_org;Baikal;12;2;1.0;1.0;1.0;0.973
+Asm_280, Suva, FIX, C_org;Coal;4;1;0.5;1.0;0.6667;0.973
+Asm_280, Suva, FIX, C_org;Lg;58;12;1.0;1.0;1.0;0.973
+Asm_280, Suva, FIX, C_org;Lst;7;1;1.0;1.0;1.0;0.973
+Asm_280, Suva, FIX, C_org;Peat;13;3;1.0;1.0;1.0;0.973
+Asm_280, Suva, FIX, C_org;Soil;11;2;1.0;0.5;0.6667;0.973
+Asm_280, Suva, FIX, C_org;Среднее (macro avg);181;37;0.9286;0.9286;0.9048;0.973
+Asm_280, Suva, FIX, C_org;Среднее (weighted avg);181;37;0.9865;0.973;0.973;0.973

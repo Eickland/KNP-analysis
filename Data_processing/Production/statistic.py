@@ -131,7 +131,25 @@ def scatter_plot_default(MainData, path, target_column, save=False, label_class=
             plt.close()
     
     return 
+
+
     
+
+# Подписи признаков для графиков (mathtext matplotlib)
+FEATURE_LABELS = {
+    'E2E3':   r'E$_2$/E$_3$',
+    'Suva':    r'SUVA$_{254}$, м$^{-1}$·л·мгC$^{-1}$',
+    'Asm_280': r'Asm$_{280}$',
+}
+
+def feature_label(feature: str) -> str:
+    """Красивая подпись признака; если её нет в словаре — имя как есть."""
+    return FEATURE_LABELS.get(feature, feature)
+
+def safe_filename(name: str) -> str:
+    """Убирает символы, недопустимые в имени файла (например '/' в 'E2/E3')."""
+    return "".join('_' if ch in r'\/:*?"<>|' else ch for ch in name)
+ 
 if __name__ == "__main__":
 
 
@@ -150,12 +168,12 @@ if __name__ == "__main__":
 
     from Data_processing.Utilits.config_paths import STAT_PATH, CACHE_DATA_PATH
 
-    BoxPlotEnable = False
+    BoxPlotEnable = True
     KdePlotEnable = False
     HistPlotEnable = False
     ImPlotEnable = False
     CustomImplotEnable = False
-    ScatterPlotEnable = True
+    ScatterPlotEnable = False
     CustomScatterPlotEnable = False
 
     def create_hierarchical_scatter(df, class_col, subclass_col, x_col, y_col,s=70):
@@ -367,8 +385,10 @@ if __name__ == "__main__":
 
     data = collection.create_flexible_descriptors_table(sample_attributes=['org_carbon','sample_subclass','sample_class'],min_coverage=0.5)
     data.dropna(inplace=True)
-
-    MainData = ut.filter_by_iqr_per_group(data,iqr_param=1.5,target_column='Subclass', filter_columns=["asm_350",'Suva'])
+    data = pd.read_excel(r"C:\Users\Kirill\Desktop\Lab\KNP-analysis\Received_data\Statistics\2024\Documents\Исходные данные за 2024 год.xlsx")
+    data = data[data['Class'] != 'Tech']
+    data = data[data['Class'] != 'Osinovka']
+    MainData = data
     numeric_cols = MainData.select_dtypes(include=['float']).columns
     MainData[numeric_cols] = MainData[numeric_cols].map(lambda x: float(f"{x:.4g}"))
 
@@ -377,16 +397,29 @@ if __name__ == "__main__":
     if BoxPlotEnable:
 
         for feature in numeric_cols:
-                
-            fig, axes = plt.subplots(1,1,figsize=(8,8),dpi=300)
-            box = sns.boxplot(data = MainData.reset_index(),
-                                hue='Class', y=feature, ax=axes)
-            ut.add_median_labels(box)
-            
+            fig, axes = plt.subplots(1, 1, figsize=(8, 8), dpi=300)
+            box = sns.boxplot(
+                data=MainData.replace({
+                    'ADOM': 'Надшламовые воды', 'Baikal': 'Байкал',
+                    'Lg': 'Лигногуматы', 'Lst': 'Лигносульфонаты',
+                    'Coal': 'Уголь', 'Peat': 'Торф', 'Soil': 'Почва'
+                }).reset_index(),
+    hue='Class',      # тот же столбец, что и x
+    legend=False,     # убрать легенду — подписи уже на оси X          # <- классы по оси X
+                y=feature,
+                x='Class',
+                dodge=False,
+                ax=axes
+            )
+            axes.set_ylabel(feature_label(feature))
+            axes.set_xlabel('Класс')
+            plt.xticks(rotation=45, ha='right')   # если подписи длинные
+            plt.tight_layout()
+            print(feature)
             plt.savefig(
-            Path.joinpath(STAT_PATH,'Correlations',
-                        'Graphs','boxplot',f'boxplot_{feature}.png')
-                    )
+                Path.joinpath(STAT_PATH, 'Correlations', 'Graphs', 'boxplot',
+                            f'boxplot_{safe_filename(feature)}.png')
+            )
             plt.close()
                 
     if KdePlotEnable:

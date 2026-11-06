@@ -11,7 +11,7 @@ INIT_DATA = PROJECT_ROOT / 'Initial_data'
 
 RECEIVED_DATA = PROJECT_ROOT / 'Server' / 'Received_data'
 
-CLASSIFICATION_PATH = PROJECT_ROOT / 'Server' / 'Received_data' /'Model'/ 'Classification'
+CLASSIFICATION_PATH = PROJECT_ROOT  / 'Received_data' /'Model'/ 'Classification'
 CLUSTERING_PATH = PROJECT_ROOT / 'Server' / 'Received_data'/'Model' / 'Clustering'
 
 PARAFAC_PATH = PROJECT_ROOT  / 'Received_data' / 'Parafac'

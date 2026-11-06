@@ -1,0 +1,28 @@
+﻿Признаки;Класс образцов;К-во образцов;Размер тестовой выборки;Точность (precision);Полнота (recall);F1-мера;Accuracy модели;Функция
+Asm_280, Component_2;ADOM;76;16;0.8235;0.875;0.8485;0.8108;δ_ADOM(x) = -6.602·Asm_280 -7.779·Component_2 +8.916
+Asm_280, Component_2;Baikal;12;2;1.0;0.5;0.6667;0.8108;δ_Baikal(x) = -10.86·Asm_280 -22.39·Component_2 +13.2
+Asm_280, Component_2;Coal;4;1;0.2;1.0;0.3333;0.8108;δ_Coal(x) = -7.386·Asm_280 +15.45·Component_2 -5.376
+Asm_280, Component_2;Lg;58;12;1.0;1.0;1.0;0.8108;δ_Lg(x) = +11·Asm_280 +11.82·Component_2 -25.07
+Asm_280, Component_2;Lst;7;1;1.0;1.0;1.0;0.8108;δ_Lst(x) = +35.82·Asm_280 +33.13·Component_2 -116.8
+Asm_280, Component_2;Peat;13;3;0.0;0.0;0.0;0.8108;δ_Peat(x) = -9.379·Asm_280 -3.541·Component_2 +7.612
+Asm_280, Component_2;Soil;11;2;1.0;0.5;0.6667;0.8108;δ_Soil(x) = -11.13·Asm_280 -6.982·Component_2 +9.664
+Asm_280, Component_2;Среднее (macro avg);181;37;0.7176;0.6964;0.645;0.8108;
+Asm_280, Component_2;Среднее (weighted avg);181;37;0.821;0.8108;0.7993;0.8108;
+Asm_280, Component_2, FIX;ADOM;76;16;1.0;1.0;1.0;0.9189;δ_ADOM(x) = -10.7·Asm_280 -10.23·Component_2 +12.08·FIX -2.615
+Asm_280, Component_2, FIX;Baikal;12;2;1.0;1.0;1.0;0.9189;δ_Baikal(x) = -18.59·Asm_280 -27.02·Component_2 +22.8·FIX -9.941
+Asm_280, Component_2, FIX;Coal;4;1;0.5;1.0;0.6667;0.9189;δ_Coal(x) = -0.3609·Asm_280 +19.65·Component_2 -20.71·FIX +10.51
+Asm_280, Component_2, FIX;Lg;58;12;1.0;1.0;1.0;0.9189;δ_Lg(x) = +16.02·Asm_280 +14.83·Component_2 -14.8·FIX -13.22
+Asm_280, Component_2, FIX;Lst;7;1;1.0;1.0;1.0;0.9189;δ_Lst(x) = +37.86·Asm_280 +34.35·Component_2 -6.021·FIX -111.6
+Asm_280, Component_2, FIX;Peat;13;3;1.0;0.3333;0.5;0.9189;δ_Peat(x) = -7.552·Asm_280 -2.447·Component_2 -5.386·FIX +12.21
+Asm_280, Component_2, FIX;Soil;11;2;0.3333;0.5;0.4;0.9189;δ_Soil(x) = -6.611·Asm_280 -4.276·Component_2 -13.33·FIX +20.45
+Asm_280, Component_2, FIX;Среднее (macro avg);181;37;0.8333;0.8333;0.7952;0.9189;
+Asm_280, Component_2, FIX;Среднее (weighted avg);181;37;0.9505;0.9189;0.918;0.9189;
+Asm_280, Suva, FIX, C_org;ADOM;76;16;1.0;0.9375;0.9677;0.9459;δ_ADOM(x) = -8.292·Asm_280 -0.2982·Suva +9.187·FIX -0.121·C_org -1.715
+Asm_280, Suva, FIX, C_org;Baikal;12;2;1.0;1.0;1.0;0.9459;δ_Baikal(x) = -12.66·Asm_280 -0.7894·Suva +15.31·FIX -0.4651·C_org -5.119
+Asm_280, Suva, FIX, C_org;Coal;4;1;0.5;1.0;0.6667;0.9459;δ_Coal(x) = -5.405·Asm_280 +0.2534·Suva -15.55·FIX +0.1502·C_org +15.08
+Asm_280, Suva, FIX, C_org;Lg;58;12;1.0;1.0;1.0;0.9459;δ_Lg(x) = +12.76·Asm_280 +0.5286·Suva -10.52·FIX +0.2353·C_org -15.24
+Asm_280, Suva, FIX, C_org;Lst;7;1;1.0;1.0;1.0;0.9459;δ_Lst(x) = +29.25·Asm_280 +0.7955·Suva +3.545·FIX +0.2652·C_org -103.5
+Asm_280, Suva, FIX, C_org;Peat;13;3;0.75;1.0;0.8571;0.9459;δ_Peat(x) = -6.75·Asm_280 -0.1496·Suva -6.31·FIX +0.06107·C_org +11.11
+Asm_280, Suva, FIX, C_org;Soil;11;2;1.0;0.5;0.6667;0.9459;δ_Soil(x) = -6.059·Asm_280 -0.2851·Suva -14.65·FIX -0.1741·C_org +23.27
+Asm_280, Suva, FIX, C_org;Среднее (macro avg);181;37;0.8929;0.9196;0.8797;0.9459;
+Asm_280, Suva, FIX, C_org;Среднее (weighted avg);181;37;0.9662;0.9459;0.9474;0.9459;
